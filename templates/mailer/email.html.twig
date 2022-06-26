@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmation de compte{% endblock %}
+{% block stylesheets %}
+<style>
+    #email-display {
+        font-weight: bold;
+    }
+
+    #confirmation-btn {
+        height: 50px;
+        font-weight: bold;
+        background-color: #3eb000;
+        color: #fff;
+        border: 0.5px solid #d3d3d3;
+        border-radius: 4px;
+        padding: 2%;
+    }
+
+    #warning {
+        color: #ff0000;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="container">
+    <img src="" alt="" class="logo-container">
+    <h1>Bienvenue!</h1>
+    <div class="email-message">
+        <p>Bonjour {{ email.toName }},</p>
+        <p>
+            Vous venez de créer un compte sur <strong>Brasil Burger</strong> avec cet adresse mail: <code><strong>{{ email.to[0].address }}</strong></code>.
+            Avant de pouvoir utiliser votre compte, vous devez vérifier que cette adresse e-mail est bien la vôtre en cliquant sur le bouton ci dessous
+        </p>
+        <center>
+            <a href="">
+                <button id="confirmation-btn">Confirmer mon compte</button>
+            </a>
+            <p><span id="warning">Attention:</span> Ce mail n'est valide que pendant {{ expiration_date|date('F jS') }}</p>
+        </center>
+        <br>
+        <p>
+            Cordialement, Brasil Burger.
+        </p>
+    </div>
+</div>
+{% endblock %}

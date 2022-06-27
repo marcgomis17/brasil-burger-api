@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
@@ -41,6 +42,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $nom;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $isVerified;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $token;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $expireAt;
+
+    public function __construct() {
+        $this->setIsVerified(false);
+    }
 
     public function getId(): ?int {
         return $this->id;
@@ -121,5 +135,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
         $this->nom = $nom;
 
         return $this;
+    }
+
+    public function getToken(): ?string {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getExpireAt(): ?\DateTimeInterface {
+        return $this->expireAt;
+    }
+
+    public function setExpireAt(?\DateTimeInterface $expireAt): self {
+        $this->expireAt = $expireAt;
+
+        return $this;
+    }
+
+    public function isIsVerified(): ?bool {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function generateToken() {
+        $this->setToken(rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '='));
+        $this->setExpireAt(new DateTime('+ 1 days'));
     }
 }

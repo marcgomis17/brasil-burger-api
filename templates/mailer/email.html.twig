@@ -34,7 +34,7 @@
             Avant de pouvoir utiliser votre compte, vous devez vérifier que cette adresse e-mail est bien la vôtre en cliquant sur le bouton ci dessous
         </p>
         <center>
-            <a href="">
+            <a href="{{ url('app_confirmation', {"token": token}) }}">
                 <button id="confirmation-btn">Confirmer mon compte</button>
             </a>
             <p><span id="warning">Attention:</span> Ce mail n'est valide que pendant {{ expiration_date|date('F jS') }}</p>

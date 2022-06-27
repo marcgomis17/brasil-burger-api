@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[DiscriminatorMap(
     [
         "burger" => "Burger",
-        "complement" => "Complement",
-        "boisson" => "Boisson"
+        "boisson" => "Boisson",
+        "portion_frite" => "PortionFrite"
     ]
 )]
 #[ApiResource(collectionOperations: [

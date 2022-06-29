@@ -2,15 +2,16 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[InheritanceType("JOINED")]
@@ -22,38 +23,35 @@ use Symfony\Component\Serializer\Annotation\Groups;
         "portion_frite" => "PortionFrite"
     ]
 )]
-#[ApiResource(collectionOperations: [
-    "get",
-    "post" => [
-        "security" => "is_granted('ROLE_GESTIONNAIRE')"
-    ]
-], itemOperations: [
-    'get',
-    "put" => [
-        "security" => "is_granted('ROLE_GESTIONNAIRE')"
-    ]
-])]
+#[ApiResource()]
 class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[Groups(['product:read:gestionnaire', 'product:read:user'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
     #[Assert\NotBlank()]
+    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
     #[Assert\NotBlank()]
+    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user'])]
     private $prix;
 
-    #[ORM\Column(type: 'string', length: 30, nullable: true)]
     #[Groups("product:read:gestionnaire")]
-    #[ApiProperty(security: "is_granted('ROLE_GESTIONNAIRE')")]
-    private $etat;
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    private $isAvailable;
+
+    #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'produits')]
+    private $commandes;
+
+    public function __construct() {
+        $this->setIsAvailable(true);
+        $this->commandes = new ArrayCollection();
+    }
 
     public function getId(): ?int {
         return $this->id;
@@ -79,12 +77,36 @@ class Produit {
         return $this;
     }
 
-    public function getEtat(): ?string {
-        return $this->etat;
+    public function isIsAvailable(): ?bool {
+        return $this->isAvailable;
     }
 
-    public function setEtat(?string $etat): self {
-        $this->etat = $etat;
+    public function setIsAvailable(?bool $isAvailable): self {
+        $this->isAvailable = $isAvailable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes[] = $commande;
+            $commande->addProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self {
+        if ($this->commandes->removeElement($commande)) {
+            $commande->removeProduit($this);
+        }
 
         return $this;
     }

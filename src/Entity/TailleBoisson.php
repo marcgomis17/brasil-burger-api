@@ -2,18 +2,22 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TailleBoissonRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TailleBoissonRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        "get",
+        "get" => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['taille:read']],
+        ],
         "post" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ],
     itemOperations: [
@@ -27,15 +31,17 @@ class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['product:write', 'product:read'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
     private $prix;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['taille:read'])]
     private $libelle;
 
-    #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'tailleBoissons')]
+    #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'tailles')]
     private $boissons;
 
     public function __construct() {
@@ -76,13 +82,16 @@ class TailleBoisson {
     public function addBoisson(Boisson $boisson): self {
         if (!$this->boissons->contains($boisson)) {
             $this->boissons[] = $boisson;
+            $boisson->addTaille($this);
         }
 
         return $this;
     }
 
     public function removeBoisson(Boisson $boisson): self {
-        $this->boissons->removeElement($boisson);
+        if ($this->boissons->removeElement($boisson)) {
+            $boisson->removeTaille($this);
+        }
 
         return $this;
     }

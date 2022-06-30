@@ -28,25 +28,25 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read:gestionnaire', 'product:read:user'])]
-    private $id;
+    #[Groups(['product:read', 'product:read:gestionnaire', 'product:read:user'])]
+    protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user'])]
-    private $nom;
+    #[Groups(['product:read', 'product:write', 'product:read:gestionnaire', 'product:read:user'])]
+    protected $nom;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank()]
-    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user'])]
-    private $prix;
+    #[Groups(['product:read', 'product:write', 'product:read:gestionnaire', 'product:read:user'])]
+    protected $prix;
 
-    #[Groups("product:read:gestionnaire")]
+    #[Groups('product:read', "product:read:gestionnaire", "product:read:user")]
     #[ORM\Column(type: 'boolean', nullable: false)]
-    private $isAvailable;
+    protected $isAvailable;
 
     #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'produits')]
-    private $commandes;
+    protected $commandes;
 
     public function __construct() {
         $this->setIsAvailable(true);

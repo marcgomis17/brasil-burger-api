@@ -2,59 +2,60 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PortionFriteRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PortionFriteRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        "getAll" => [
-            "method" => "get",
-            "path" => "/gestionnaire/frites",
-            "status" => Response::HTTP_OK,
-            "normalization_context" => ["groups" => ["product:read:gestionnaire"]],
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
+        'getAll' => [
+            'method' => 'GET',
+            'path' => '/gestionnaire/portion_frite',
+            'normalization_context' => ['groups' => ['product:read:gestionnaire']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ],
-        "getUsers" => [
-            "method" => "get",
-            "status" => Response::HTTP_OK,
-            "normalization_context" => ["groups" => ["product:read:users"]]
+        'get' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['product:read:user']],
         ],
-        "post" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
-        ]
-    ],
-    itemOperations: [
-        'get',
-        "put" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
+        'post' => [
+            'method' => 'POST',
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'denormalization_context' => ['groups' => ['product:write']],
         ]
     ]
 )]
 class PortionFrite extends Produit {
     #[ORM\Column(type: 'string', length: 70)]
+    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user'])]
     private $portion;
 
     #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'frites')]
+    #[Groups(['product:read:gestionnaire', 'product:read:user'])]
     private $menus;
 
-    #[ORM\OneToMany(mappedBy: 'frites', targetEntity: Complement::class)]
-    private $complements;
-
     public function __construct() {
+        parent::__construct();
         $this->menus = new ArrayCollection();
-        $this->complements = new ArrayCollection();
     }
 
-    public function getPortion(): ?string {
+    /**
+     * Get the value of portion
+     */
+    public function getPortion() {
         return $this->portion;
     }
 
-    public function setPortion(string $portion): self {
+    /**
+     * Set the value of portion
+     *
+     * @return  self
+     */
+    public function setPortion($portion) {
         $this->portion = $portion;
 
         return $this;
@@ -79,33 +80,6 @@ class PortionFrite extends Produit {
     public function removeMenu(Menu $menu): self {
         if ($this->menus->removeElement($menu)) {
             $menu->removeFrite($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Complement>
-     */
-    public function getComplements(): Collection {
-        return $this->complements;
-    }
-
-    public function addComplement(Complement $complement): self {
-        if (!$this->complements->contains($complement)) {
-            $this->complements[] = $complement;
-            $complement->setFrites($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComplement(Complement $complement): self {
-        if ($this->complements->removeElement($complement)) {
-            // set the owning side to null (unless already changed)
-            if ($complement->getFrites() === $this) {
-                $complement->setFrites(null);
-            }
         }
 
         return $this;

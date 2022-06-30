@@ -6,33 +6,34 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        "getAll" => [
-            "method" => "get",
-            "path" => "/gestionnaire/Menus",
-            "status" => Response::HTTP_OK,
-            "normalization_context" => ["groups" => ["product:read:gestionnaire"]],
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
+        'get' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['product:read']],
         ],
-        "getUsers" => [
-            "method" => "get",
-            "status" => Response::HTTP_OK,
-            "normalization_context" => ["groups" => ["product:read:users"]]
-        ],
-        "post" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
+        'post' => [
+            'method' => 'POST',
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'normalization_context' => ['groups' => ['read']],
+            'denormalization_context' => ['groups' => ['menu:write']],
         ]
     ],
     itemOperations: [
         'get',
-        "put" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
+        'put' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'normalization_context' => ['groups' => ['read']],
+            'denormalization_context' => ['groups' => ['menu:write']],
+        ],
+        'patch' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'normalization_context' => ['groups' => ['read']],
+            'denormalization_context' => ['groups' => ['menu:write']],
         ]
     ]
 )]
@@ -40,32 +41,31 @@ class Menu {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[Groups(['menu:write', 'read', 'product:read'])]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 60)]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[ORM\Column(type: 'string', length: 100, unique: true)]
+    #[Groups(['menu:write', 'read', 'product:read'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[Groups(['menu:write', 'read', 'product:read'])]
     private $prix;
 
-    #[ORM\Column(type: 'string', length: 30, nullable: true)]
-    #[Groups(["product:read:gestionnaire"])]
-    private $etat;
-
     #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'menus')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[Groups(['menu:write', 'read', 'product:read'])]
     private $burgers;
 
     #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'menus')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[Groups(['menu:write', 'read', 'product:read'])]
     private $boissons;
 
     #[ORM\ManyToMany(targetEntity: PortionFrite::class, inversedBy: 'menus')]
-    #[Groups(["product:read:users", "product:read:gestionnaire"])]
+    #[Groups(['menu:write', 'read', 'product:read'])]
     private $frites;
+
+    #[ORM\ManyToOne(targetEntity: Catalogue::class, inversedBy: 'menus')]
+    private $catalogue;
 
     public function __construct() {
         $this->burgers = new ArrayCollection();
@@ -73,36 +73,20 @@ class Menu {
         $this->frites = new ArrayCollection();
     }
 
-    public function getId(): ?int {
+    /**
+     * Get the value of id
+     */
+    public function getId() {
         return $this->id;
     }
 
-    public function getNom(): ?string {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): self {
-        $this->nom = $nom;
-
-        return $this;
-    }
-
-    public function getPrix(): ?int {
-        return $this->prix;
-    }
-
-    public function setPrix(int $prix): self {
-        $this->prix = $prix;
-
-        return $this;
-    }
-
-    public function getEtat(): ?string {
-        return $this->etat;
-    }
-
-    public function setEtat(string $etat): self {
-        $this->etat = $etat;
+    /**
+     * Set the value of id
+     *
+     * @return  self
+     */
+    public function setId($id) {
+        $this->id = $id;
 
         return $this;
     }
@@ -166,6 +150,36 @@ class Menu {
 
     public function removeFrite(PortionFrite $frite): self {
         $this->frites->removeElement($frite);
+
+        return $this;
+    }
+
+    public function getCatalogue(): ?Catalogue {
+        return $this->catalogue;
+    }
+
+    public function setCatalogue(?Catalogue $catalogue): self {
+        $this->catalogue = $catalogue;
+
+        return $this;
+    }
+
+    public function getNom(): ?string {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrix(): ?int {
+        return $this->prix;
+    }
+
+    public function setPrix(int $prix): self {
+        $this->prix = $prix;
 
         return $this;
     }

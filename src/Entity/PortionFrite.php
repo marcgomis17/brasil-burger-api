@@ -12,12 +12,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: PortionFriteRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        'getAll' => [
-            'method' => 'GET',
-            'path' => '/gestionnaire/portion_frite',
-            'normalization_context' => ['groups' => ['product:read:gestionnaire']],
-            'security' => "is_granted('ROLE_GESTIONNAIRE')"
-        ],
         'get' => [
             'method' => 'GET',
             'normalization_context' => ['groups' => ['product:read:user']],
@@ -27,16 +21,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
             'denormalization_context' => ['groups' => ['product:write']],
         ]
+    ],
+    itemOperations: [
+        'get',
+        'put' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+        ]
     ]
 )]
 class PortionFrite extends Produit {
     #[ORM\Column(type: 'string', length: 70)]
-    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user'])]
+    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user', 'post:read'])]
     private $portion;
 
     #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'frites')]
-    #[Groups(['product:read:gestionnaire', 'product:read:user'])]
     private $menus;
+
+    #[ORM\ManyToOne(targetEntity: Complement::class, inversedBy: 'frites')]
+    private $complement;
 
     public function __construct() {
         parent::__construct();
@@ -81,6 +83,16 @@ class PortionFrite extends Produit {
         if ($this->menus->removeElement($menu)) {
             $menu->removeFrite($this);
         }
+
+        return $this;
+    }
+
+    public function getComplement(): ?Complement {
+        return $this->complement;
+    }
+
+    public function setComplement(?Complement $complement): self {
+        $this->complement = $complement;
 
         return $this;
     }

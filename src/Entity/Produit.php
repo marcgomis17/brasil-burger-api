@@ -28,21 +28,25 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'product:read:gestionnaire', 'product:read:user'])]
+    #[Groups(['write', 'menu:write', 'read', 'product:read', 'menu:read'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:read', 'product:write', 'product:read:gestionnaire', 'product:read:user'])]
+    #[Groups(['write', 'read', 'product:read', 'menu:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank()]
-    #[Groups(['product:read', 'product:write', 'product:read:gestionnaire', 'product:read:user'])]
+    #[Groups(['write', 'read', 'product:read', 'menu:read'])] 
     protected $prix;
 
-    #[Groups('product:read', "product:read:gestionnaire", "product:read:user")]
+    #[ORM\Column(type: 'blob')]
+    // #[Groups(['write', 'product:read'])]
+    private $image;
+
     #[ORM\Column(type: 'boolean', nullable: false)]
+    #[Groups(['product:read:gestionnaire'])]
     protected $isAvailable;
 
     #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'produits')]
@@ -107,6 +111,16 @@ class Produit {
         if ($this->commandes->removeElement($commande)) {
             $commande->removeProduit($this);
         }
+
+        return $this;
+    }
+
+    public function getImage() {
+        return $this->image;
+    }
+
+    public function setImage($image): self {
+        $this->image = $image;
 
         return $this;
     }

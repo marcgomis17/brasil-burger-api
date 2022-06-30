@@ -9,27 +9,24 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        'getAll' => [
-            'method' => 'GET',
-            'path' => '/gestionnaire/boissons',
-            'normalization_context' => ['groups' => ['product:read:gestionnaire']],
-            'security' => "is_granted('ROLE_GESTIONNAIRE')"
-        ],
         'get' => [
             'method' => 'GET',
-            'normalization_context' => ['groups' => ['product:read:user']],
+            'normalization_context' => ['groups' => ['product:read']],
         ],
         'post' => [
             'method' => 'POST',
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'normalization_context' => ['groups' => ['product:read']],
-            'denormalization_context' => ['groups' => ['product:write']],
+            'denormalization_context' => ['groups' => ['write']],
+        ]
+    ],
+    itemOperations: [
+        'get',
+        'put' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ]
 )]
@@ -37,10 +34,12 @@ class Boisson extends Produit {
     #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'boissons')]
     private $menus;
 
-    #[ORM\ManyToMany(targetEntity: TailleBoisson::class, inversedBy: 'boissons', cascade: ['persist'])]
-    #[ApiProperty()]
-    #[Groups(['product:write', 'product:read'])]
+    #[ORM\ManyToMany(targetEntity: TailleBoisson::class, inversedBy: 'boissons')]
+    #[Groups(['write', 'read', 'menu:read', 'product:read'])]
     private $tailles;
+
+    #[ORM\ManyToOne(targetEntity: Complement::class, inversedBy: 'boissons')]
+    private $complement;
 
     public function __construct() {
         parent::__construct();
@@ -89,6 +88,16 @@ class Boisson extends Produit {
 
     public function removeTaille(TailleBoisson $taille): self {
         $this->tailles->removeElement($taille);
+
+        return $this;
+    }
+
+    public function getComplement(): ?Complement {
+        return $this->complement;
+    }
+
+    public function setComplement(?Complement $complement): self {
+        $this->complement = $complement;
 
         return $this;
     }

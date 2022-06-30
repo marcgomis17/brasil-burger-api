@@ -12,10 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: TailleBoissonRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        "get" => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['taille:read']],
-        ],
+        "get",
         "post" => [
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
         ]
@@ -31,14 +28,14 @@ class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:write', 'product:read'])]
+    #[Groups(['write', 'read', 'product:read'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
     private $prix;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['taille:read'])]
+    #[Groups(['read', 'menu:read', 'product:read'])]
     private $libelle;
 
     #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'tailles')]

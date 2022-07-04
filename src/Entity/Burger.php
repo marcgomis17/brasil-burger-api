@@ -7,26 +7,28 @@ use App\Repository\BurgerRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BurgerRepository::class)]
 #[ApiResource(
     collectionOperations: [
         'get' => [
-            'method' => 'GET',
             'normalization_context' => ['groups' => ['product:read']],
         ],
         'post' => [
-            'method' => 'POST',
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['write']],
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
+            'denormalization_context' => ['groups' => ['product:write']],
+            'normalization_context' => ['groups' => ['product:read:post']],
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-        ]
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
+        ],
     ]
 )]
 class Burger extends Produit {
@@ -61,4 +63,16 @@ class Burger extends Produit {
 
         return $this;
     }
+
+    /*  public function getCatalogue(): ?Catalogue
+    {
+        return $this->catalogue;
+    }
+
+    public function setCatalogue(?Catalogue $catalogue): self
+    {
+        $this->catalogue = $catalogue;
+
+        return $this;
+    } */
 }

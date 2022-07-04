@@ -7,6 +7,7 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Entity\Catalogue;
 use App\Repository\BurgerRepository;
 use App\Repository\MenuRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 
 final class CatalogueDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
     private $burgerRepo;
@@ -22,11 +23,17 @@ final class CatalogueDataProvider implements ContextAwareCollectionDataProviderI
     }
 
     public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []) {
+        $catalogue = new Catalogue();
         $burgers = $this->burgerRepo->findBy([/* 'isAvailable' => true */]);
         $menus = $this->menuRepo->findBy([/* 'isAvailable' => true */]);
-        return [
-            'burgers' => $burgers,
-            'menus' => $menus
-        ];
+        foreach ($burgers as $burger) {
+            $catalogue->addBurger($burger);
+        }
+        foreach ($menus as $menu) {
+            $catalogue->addMenu($menu);
+        }
+        $collection = new ArrayCollection(array('burgers' => $catalogue->getBurgers(), 'menus' => $catalogue->getMenus()));
+        dd($collection);
+        return $collection;
     }
 }

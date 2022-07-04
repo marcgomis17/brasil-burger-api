@@ -14,19 +14,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     collectionOperations: [
         'get' => [
-            'method' => 'GET',
             'normalization_context' => ['groups' => ['product:read']],
         ],
         'post' => [
-            'method' => 'POST',
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['write']],
-        ]
-    ],
-    itemOperations: [
-        'get',
-        'put' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
+            'denormalization_context' => ['groups' => ['product:write']],
+            'normalization_context' => ['groups' => ['product:read:post']],
         ]
     ]
 )]
@@ -35,7 +30,7 @@ class Boisson extends Produit {
     private $menus;
 
     #[ORM\ManyToMany(targetEntity: TailleBoisson::class, inversedBy: 'boissons')]
-    #[Groups(['write', 'read', 'menu:read', 'product:read'])]
+    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:read:post'])]
     private $tailles;
 
     #[ORM\ManyToOne(targetEntity: Complement::class, inversedBy: 'boissons')]

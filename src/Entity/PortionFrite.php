@@ -13,25 +13,30 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     collectionOperations: [
         'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['product:read:user']],
+            'normalization_context' => ['groups' => ['product:read']],
         ],
         'post' => [
-            'method' => 'POST',
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['product:write']],
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
+            'denormalization_context' => ['groups' => ['product:write']]
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'denormalization_context' => ['groups' => ['product:write']],
+        ],
+        'patch' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'denormalization_context' => ['groups' => ['product:write']],
         ]
     ]
 )]
 class PortionFrite extends Produit {
     #[ORM\Column(type: 'string', length: 70)]
-    #[Groups(['product:write', 'product:read:gestionnaire', 'product:read:user', 'post:read'])]
+    #[Groups(['product:read', 'product:write', 'menu:read:post', 'menu:write'])]
     private $portion;
 
     #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'frites')]

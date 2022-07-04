@@ -24,11 +24,11 @@ class Catalogue {
     private $id;
 
     #[ORM\OneToMany(mappedBy: 'catalogue', targetEntity: Burger::class)]
-    #[Groups(['read', 'product:read'])]
+    #[Groups(['product:read', 'menu:read'])]
     private $burgers;
 
     #[ORM\OneToMany(mappedBy: 'catalogue', targetEntity: Menu::class)]
-    #[Groups(['read', 'product:read'])]
+    #[Groups(['product:read', 'menu:read'])]
     private $menus;
 
     public function __construct() {
@@ -39,4 +39,57 @@ class Catalogue {
     public function getId(): ?int {
         return $this->id;
     }
+
+    /**
+     * @return Collection<int, Burger>
+     */
+    public function getBurgers(): Collection {
+        return $this->burgers;
+    }
+
+    public function addBurger(Burger $burger): self {
+        if (!$this->burgers->contains($burger)) {
+            $this->burgers[] = $burger;
+        }
+
+        return $this;
+    }
+
+    /* public function removeBurger(Burger $burger): self {
+        if ($this->burgers->removeElement($burger)) {
+            // set the owning side to null (unless already changed)
+            if ($burger->getCatalogue() === $this) {
+                $burger->setCatalogue(null);
+            }
+        }
+
+        return $this;
+    } */
+
+    /**
+     * @return Collection<int, Menu>
+     */
+    public function getMenus(): Collection {
+        return $this->menus;
+    }
+
+    public function addMenu(Menu $menu): self {
+        if (!$this->menus->contains($menu)) {
+            $this->menus[] = $menu;
+        }
+
+        return $this;
+    }
+
+    /* public function removeMenu(Menu $menu): self
+    {
+        if ($this->menus->removeElement($menu)) {
+            // set the owning side to null (unless already changed)
+            if ($menu->getCatalogue() === $this) {
+                $menu->setCatalogue(null);
+            }
+        }
+
+        return $this;
+    } */
 }

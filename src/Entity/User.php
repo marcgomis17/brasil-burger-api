@@ -9,8 +9,10 @@ use Doctrine\ORM\Mapping\InheritanceType;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[InheritanceType("JOINED")]
@@ -18,7 +20,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[DiscriminatorMap(
     [
         "gestionnaire" => "Gestionnaire",
-        "client" => "Client"
+        "client" => "Client",
+        "livreur" => "Livreur",
     ]
 )]
 #[ApiResource()]
@@ -26,21 +29,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['users:read', 'orders:write', 'product:write', 'product:read', 'product:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['users:write', 'users:read'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
     private $roles = [];
 
+    #[SerializedName('password')]
+    #[Groups(['users:write'])]
+    private $plainPassword;
+
     #[ORM\Column(type: 'string')]
+    #[Groups(['users:read'])]
     private $password;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['users:write', 'users:read'])]
     private $prenom;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['users:write', 'users:read'])]
     private $nom;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
@@ -170,5 +182,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     public function generateToken() {
         $this->setToken(rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '='));
         $this->setExpireAt(new DateTime('+ 1 days'));
+    }
+
+    public function getPlainPassword(): ?string {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): self {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
     }
 }

@@ -4,19 +4,20 @@ namespace App\DataPersister;
 
 use App\Entity\User;
 use App\Entity\Client;
+use App\Service\Hasher;
 use App\Service\Mailer;
 use App\Entity\Gestionnaire;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\Livreur;
 
 class UserPersister implements DataPersisterInterface {
     private $manager;
     private $hasher;
     private $mailer;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager, Mailer $mailer) {
-        $this->hasher = $passwordHasher;
+    public function __construct(Hasher $hasher, EntityManagerInterface $entityManager, Mailer $mailer) {
+        $this->hasher = $hasher;
         $this->manager = $entityManager;
         $this->mailer = $mailer;
     }
@@ -26,10 +27,10 @@ class UserPersister implements DataPersisterInterface {
     }
 
     public function persist($data) {
-        $data->setPassword($this->hasher->hashPassword($data, $data->getPassword()));
+        $data->setPassword($this->hasher->hashPassword($data, $data->getPlainPassword()));
         $data->generateToken();
-        if ($data instanceof Gestionnaire) {
-            $data->setIsVerified(true);
+        if ($data instanceof Gestionnaire || $data instanceof Livreur) {
+            $data->setToken('');
         }
         $this->manager->persist($data);
         $this->manager->flush();

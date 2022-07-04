@@ -2,16 +2,18 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
-use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[InheritanceType("JOINED")]
@@ -28,29 +30,38 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['write', 'menu:write', 'read', 'product:read', 'menu:read'])]
+    #[Groups(['product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'orders:write'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['write', 'read', 'product:read', 'menu:read'])]
+    #[Groups(['product:read', 'product:read:post', 'product:write', 'menu:read:post'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Assert\NotBlank()]
-    #[Groups(['write', 'read', 'product:read', 'menu:read'])] 
+    #[Groups(['product:read', 'product:read:post', 'menu:read:post',])]
     protected $prix;
 
-    #[ORM\Column(type: 'blob')]
-    // #[Groups(['write', 'product:read'])]
-    private $image;
+    #[ORM\Column(type: 'blob', nullable: true)]
+    #[Groups(['product:read', 'product:read:post'])]
+    protected $image;
 
     #[ORM\Column(type: 'boolean', nullable: false)]
-    #[Groups(['product:read:gestionnaire'])]
+    #[Groups(['product:read:post'])]
     protected $isAvailable;
 
-    #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'produits')]
-    protected $commandes;
+    #[Groups(['product:write'])]
+    #[SerializedName('image')]
+    private ?File $file;
+
+    #[SerializedName(('prix'))]
+    #[Groups(['product:write'])]
+    private $sPrix;
+
+    #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['product:read', 'product:write', 'product:read:post'])]
+    private $gestionnaire;
 
     public function __construct() {
         $this->setIsAvailable(true);
@@ -91,36 +102,50 @@ class Produit {
         return $this;
     }
 
-    /**
-     * @return Collection<int, Commande>
-     */
-    public function getCommandes(): Collection {
-        return $this->commandes;
-    }
-
-    public function addCommande(Commande $commande): self {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes[] = $commande;
-            $commande->addProduit($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommande(Commande $commande): self {
-        if ($this->commandes->removeElement($commande)) {
-            $commande->removeProduit($this);
-        }
-
-        return $this;
-    }
-
     public function getImage() {
-        return $this->image;
+        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8');
     }
 
     public function setImage($image): self {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getSPrix(): ?string {
+        return $this->sPrix;
+    }
+
+    public function setSPrix(string $sPrix): self {
+        $this->sPrix = $sPrix;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of file
+     */
+    public function getFile() {
+        return $this->file;
+    }
+
+    /**
+     * Set the value of file
+     *
+     * @return  self
+     */
+    public function setFile($file) {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    public function getGestionnaire(): ?Gestionnaire {
+        return $this->gestionnaire;
+    }
+
+    public function setGestionnaire(?Gestionnaire $gestionnaire): self {
+        $this->gestionnaire = $gestionnaire;
 
         return $this;
     }

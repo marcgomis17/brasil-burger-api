@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         "get",
         "post" => [
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "denormalization_context" => ['groups' => ['boisson:write']],
         ]
     ],
     itemOperations: [
@@ -28,14 +29,11 @@ class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['write', 'read', 'product:read'])]
+    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:read:post'])]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
-    private $prix;
-
-    #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read', 'menu:read', 'product:read'])]
+    #[ORM\Column(type: 'string', length: 100, unique: true)]
+    #[Groups(['product:read', 'product:read:post', 'menu:read:post'])]
     private $libelle;
 
     #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'tailles')]
@@ -47,16 +45,6 @@ class TailleBoisson {
 
     public function getId(): ?int {
         return $this->id;
-    }
-
-    public function getPrix(): ?int {
-        return $this->prix;
-    }
-
-    public function setPrix(int $prix): self {
-        $this->prix = $prix;
-
-        return $this;
     }
 
     public function getLibelle(): ?string {

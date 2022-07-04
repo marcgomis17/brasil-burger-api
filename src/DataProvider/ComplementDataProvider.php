@@ -7,6 +7,8 @@ use App\Repository\BoissonRepository;
 use App\Repository\PortionFriteRepository;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use PhpParser\Node\Expr\Cast\Array_;
 
 final class ComplementDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
     private $boissonsRepo;
@@ -22,18 +24,15 @@ final class ComplementDataProvider implements ContextAwareCollectionDataProvider
     }
 
     public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []) {
-        $boissons = $this->boissonsRepo->findBy([/* 'isAvailable' => true */]);
-        $frites = $this->fritesRepo->findBy([/* 'isAvailable' => true */]);
-        /*  foreach ($boissons as $boisson) {
-            yield $boisson;
+        $complement = new Complement();
+        $boissons = $this->boissonsRepo->findBy(['isAvailable' => true]);
+        $frites = $this->fritesRepo->findBy(['isAvailable' => true]);
+        foreach ($boissons as $boisson) {
+            $complement->addBoisson($boisson);
         }
-
         foreach ($frites as $frite) {
-            yield $frite;
-        } */
-        return [
-            'frites' => $frites,
-            'boissons' => $boissons,
-        ];
+            $complement->addFrite($frite);
+        }
+        return new ArrayCollection(array('boissons' => $complement->getBoissons(), 'frites' => $complement->getFrites()));
     }
 }

@@ -12,29 +12,57 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['zone:read']],
+        ],
+        'post' => [
+            'denormalization_context' => ['groups' => ['zone:write']],
+            'normalization_context' => ['groups' => ['zone:read:post']],
+        ]
+    ],
+    itemOperations: [
+        'get',
+        'put' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'denormalization_context' => ['groups' => ['zone:write']],
+        ],
+        'patch' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'denormalization_context' => ['groups' => ['zone:write']],
+        ]
+    ]
+)]
 class Zone {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['orders:write', 'product:read'])]
+    #[Groups(['orders:write', 'quartier:write', 'quartier:read', 'zone:read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['zone:write', 'zone:read', 'zone:read:post', 'quartier:read'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['zone:write', 'zone:read', 'zone:read:post'])]
     private $prix;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]
+    #[Groups(['zone:read'])]
     private $quartiers;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class)]
     private $commandes;
 
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Livraison::class)]
+    private $livraisons;
+
     public function __construct() {
         $this->quartiers = new ArrayCollection();
         $this->commandes = new ArrayCollection();
+        $this->livraisons = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -109,6 +137,33 @@ class Zone {
             // set the owning side to null (unless already changed)
             if ($commande->getZone() === $this) {
                 $commande->setZone(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Livraison>
+     */
+    public function getLivraisons(): Collection {
+        return $this->livraisons;
+    }
+
+    public function addLivraison(Livraison $livraison): self {
+        if (!$this->livraisons->contains($livraison)) {
+            $this->livraisons[] = $livraison;
+            $livraison->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivraison(Livraison $livraison): self {
+        if ($this->livraisons->removeElement($livraison)) {
+            // set the owning side to null (unless already changed)
+            if ($livraison->getZone() === $this) {
+                $livraison->setZone(null);
             }
         }
 

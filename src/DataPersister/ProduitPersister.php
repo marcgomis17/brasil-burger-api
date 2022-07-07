@@ -37,7 +37,9 @@ final class ProduitPersister implements DataPersisterInterface {
         $data->setImage($this->uploader->upload($body['image']));
         $data->setGestionnaire($this->security->getUser());
         if (isset($body['taille'])) {
-            $data->addTaille($this->tailleRepo->findOneBy(['libelle' => $body['taille']]));
+            foreach ($body['taille'] as $taille) {
+                $data->addTaille($this->tailleRepo->findOneBy(['id' => $taille['id']]));
+            }
         }
         $this->em->persist($data);
         $this->em->flush();
@@ -46,12 +48,4 @@ final class ProduitPersister implements DataPersisterInterface {
     public function remove($data) {
         $data->setIsAvailable(false);
     }
-
-    /*
-    public function persist($data) {
-        
-    }
-
-    public function remove($data) {
-    } */
 }

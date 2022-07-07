@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BoissonRepository;
 use Doctrine\Common\Collections\Collection;
@@ -40,30 +39,6 @@ class Boisson extends Produit {
         parent::__construct();
         $this->menus = new ArrayCollection();
         $this->tailles = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenus(): Collection {
-        return $this->menus;
-    }
-
-    public function addMenu(Menu $menu): self {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addBoisson($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMenu(Menu $menu): self {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeBoisson($this);
-        }
-
-        return $this;
     }
 
     /**

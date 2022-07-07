@@ -9,7 +9,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Positive;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 #[ApiResource(
@@ -48,48 +51,51 @@ class Menu {
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
+    #[Assert\NotBlank()]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read:post', 'menu:read'])]
+    #[Groups(['menu:read', 'menu:read:post'])]
+    #[Assert\All(
+        [
+            new Assert\NotBlank(),
+            new Assert\Positive()
+        ]
+    )]
     private $prix;
 
-    #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'menus')]
-    #[Groups(['menu:read:post', 'menu:write'])]
-    private $burgers;
-
-    #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'menus')]
-    #[Groups(['menu:read:post', 'menu:write'])]
-    private $boissons;
-
     #[ORM\ManyToMany(targetEntity: PortionFrite::class, inversedBy: 'menus')]
-    #[Groups(['menu:read:post', 'menu:write'])]
+    #[Groups(['menu:write', 'menu:read:post'])]
     private $frites;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'menus')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['menu:read', 'menu:read:post', 'menu:write'])]
+    #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
     private $gestionnaire;
-
-    #[SerializedName(('prix'))]
-    #[Groups(['menu:write'])]
-    private $sPrix;
 
     #[ORM\Column(type: 'blob')]
     private $image;
 
-    #[Groups(['menu:write'])]
+    // #[Groups(['menu:write'])]
     #[SerializedName('image')]
     private ?File $file;
+
+    #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
+    #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
+    private $menuBurgers;
+
+    #[ORM\ManyToMany(targetEntity: TailleBoisson::class, inversedBy: 'menus')]
+    #[Groups(['menu:write', 'menu:read:post'])]
+    private $tailles;
 
     #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'menus')]
     private $commandes;
 
     public function __construct() {
-        $this->burgers = new ArrayCollection();
-        $this->boissons = new ArrayCollection();
-        $this->frites = new ArrayCollection();
         $this->commandes = new ArrayCollection();
+        $this->frites = new ArrayCollection();
+        $this->menuBurgers = new ArrayCollection();
+        $this->tailles = new ArrayCollection();
     }
 
     /**
@@ -127,27 +133,6 @@ class Menu {
 
     public function removeBurger(Burger $burger): self {
         $this->burgers->removeElement($burger);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Boisson>
-     */
-    public function getBoissons(): Collection {
-        return $this->boissons;
-    }
-
-    public function addBoisson(Boisson $boisson): self {
-        if (!$this->boissons->contains($boisson)) {
-            $this->boissons[] = $boisson;
-        }
-
-        return $this;
-    }
-
-    public function removeBoisson(Boisson $boisson): self {
-        $this->boissons->removeElement($boisson);
 
         return $this;
     }
@@ -218,34 +203,12 @@ class Menu {
         return $this;
     }
 
-    /*  public function getCatalogue(): ?Catalogue
-    {
-        return $this->catalogue;
-    }
-
-    public function setCatalogue(?Catalogue $catalogue): self
-    {
-        $this->catalogue = $catalogue;
-
-        return $this;
-    } */
-
     public function getGestionnaire(): ?Gestionnaire {
         return $this->gestionnaire;
     }
 
     public function setGestionnaire(?Gestionnaire $gestionnaire): self {
         $this->gestionnaire = $gestionnaire;
-
-        return $this;
-    }
-
-    public function getSPrix(): ?string {
-        return $this->sPrix;
-    }
-
-    public function setSPrix(string $sPrix): self {
-        $this->sPrix = $sPrix;
 
         return $this;
     }
@@ -274,6 +237,45 @@ class Menu {
 
     public function setImage($image): self {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of menuBurgers
+     */
+    public function getMenuBurgers() {
+        return $this->menuBurgers;
+    }
+
+    /**
+     * Set the value of menuBurgers
+     *
+     * @return  self
+     */
+    public function setMenuBurgers($menuBurgers) {
+        $this->menuBurgers = $menuBurgers;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TailleBoisson>
+     */
+    public function getTailles(): Collection {
+        return $this->tailles;
+    }
+
+    public function addTaille(TailleBoisson $taille): self {
+        if (!$this->tailles->contains($taille)) {
+            $this->tailles[] = $taille;
+        }
+
+        return $this;
+    }
+
+    public function removeTaille(TailleBoisson $taille): self {
+        $this->tailles->removeElement($taille);
 
         return $this;
     }

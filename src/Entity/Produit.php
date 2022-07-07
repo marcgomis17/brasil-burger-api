@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
@@ -30,16 +29,22 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'orders:write'])]
+    #[Groups(['product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'menu:burger:write', 'orders:write'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:read', 'product:read:post', 'product:write', 'menu:read:post'])]
+    #[Groups(['product:read', 'product:read:post', 'product:write', 'menu:read:post', 'menu:burger:read:post'])]
     protected $nom;
 
-    #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'product:read:post', 'menu:read:post',])]
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Assert\All(
+        [
+            new Assert\NotBlank(),
+            new Assert\Positive()
+        ]
+    )]
+    #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'menu:burger:read:post'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
@@ -103,7 +108,7 @@ class Produit {
     }
 
     public function getImage() {
-        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8');
+        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8'); // FIXME: stream_get_contents parameter[#1] must be a resource, string given
     }
 
     public function setImage($image): self {

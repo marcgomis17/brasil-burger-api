@@ -29,18 +29,26 @@ class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:read:post'])]
+    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
-    #[Groups(['product:read', 'product:read:post', 'menu:read:post'])]
+    #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'boisson:write'])]
     private $libelle;
+
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'boisson:write'])]
+    private $prix;
 
     #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'tailles')]
     private $boissons;
 
+    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'tailles')]
+    private $menus;
+
     public function __construct() {
         $this->boissons = new ArrayCollection();
+        $this->menus = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -77,6 +85,40 @@ class TailleBoisson {
         if ($this->boissons->removeElement($boisson)) {
             $boisson->removeTaille($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Menu>
+     */
+    public function getMenus(): Collection {
+        return $this->menus;
+    }
+
+    public function addMenu(Menu $menu): self {
+        if (!$this->menus->contains($menu)) {
+            $this->menus[] = $menu;
+            $menu->addTaille($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenu(Menu $menu): self {
+        if ($this->menus->removeElement($menu)) {
+            $menu->removeTaille($this);
+        }
+
+        return $this;
+    }
+
+    public function getPrix(): ?int {
+        return $this->prix;
+    }
+
+    public function setPrix(int $prix): self {
+        $this->prix = $prix;
 
         return $this;
     }

@@ -3,13 +3,13 @@
 namespace App\DataPersister;
 
 use App\Entity\Produit;
-use App\Service\ImageUploader;
+use App\IService\IFileUploader;
 use App\Service\MultipartDecoder;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use App\Repository\TailleBoissonRepository;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
+use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 
 final class ProduitPersister implements DataPersisterInterface {
     private $decoder;
@@ -18,7 +18,7 @@ final class ProduitPersister implements DataPersisterInterface {
     private $security;
     private $tailleRepo;
 
-    public function __construct(RequestStack $request, ImageUploader $uploader, EntityManagerInterface $entityManagerInterface, Security $security, TailleBoissonRepository $tailleBoissonRepository) {
+    public function __construct(RequestStack $request, IFileUploader $uploader, EntityManagerInterface $entityManagerInterface, Security $security, TailleBoissonRepository $tailleBoissonRepository) {
         $this->decoder = new MultipartDecoder($request);
         $this->uploader = $uploader;
         $this->em = $entityManagerInterface;

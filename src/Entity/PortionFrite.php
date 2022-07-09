@@ -39,15 +39,13 @@ class PortionFrite extends Produit {
     #[Groups(['product:read', 'product:write', 'menu:read:post'])]
     private $portion;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'frites')]
-    private $menus;
-
-    #[ORM\ManyToOne(targetEntity: Complement::class, inversedBy: 'frites')]
-    private $complement;
+    #[ORM\OneToMany(mappedBy: 'frites', targetEntity: MenuPortionFrite::class)]
+    private $menuPortionFrites;
 
     public function __construct() {
         parent::__construct();
         $this->menus = new ArrayCollection();
+        $this->menuPortionFrites = new ArrayCollection();
     }
 
     /**
@@ -69,35 +67,28 @@ class PortionFrite extends Produit {
     }
 
     /**
-     * @return Collection<int, Menu>
+     * @return Collection<int, MenuPortionFrite>
      */
-    public function getMenus(): Collection {
-        return $this->menus;
+    public function getMenuPortionFrites(): Collection {
+        return $this->menuPortionFrites;
     }
 
-    public function addMenu(Menu $menu): self {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addFrite($this);
+    public function addMenuPortionFrite(MenuPortionFrite $menuPortionFrite): self {
+        if (!$this->menuPortionFrites->contains($menuPortionFrite)) {
+            $this->menuPortionFrites[] = $menuPortionFrite;
+            $menuPortionFrite->setFrites($this);
         }
 
         return $this;
     }
 
-    public function removeMenu(Menu $menu): self {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeFrite($this);
+    public function removeMenuPortionFrite(MenuPortionFrite $menuPortionFrite): self {
+        if ($this->menuPortionFrites->removeElement($menuPortionFrite)) {
+            // set the owning side to null (unless already changed)
+            if ($menuPortionFrite->getFrites() === $this) {
+                $menuPortionFrite->setFrites(null);
+            }
         }
-
-        return $this;
-    }
-
-    public function getComplement(): ?Complement {
-        return $this->complement;
-    }
-
-    public function setComplement(?Complement $complement): self {
-        $this->complement = $complement;
 
         return $this;
     }

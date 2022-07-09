@@ -41,14 +41,14 @@ class MenuBurger {
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Assert\Positive()]
     #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:burger:read', 'menu:burger:read:post', 'menu:burger:write'])]
+    #[Assert\Positive()]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\Count(min: 1)]
     #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:burger:read', 'menu:burger:read:post', 'menu:burger:write'])]
+    #[Assert\Valid()]
     private $burgers;
 
     public function getId(): ?int {

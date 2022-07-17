@@ -7,17 +7,18 @@ use App\IService\ICalculPrix;
 class CalculPrix implements ICalculPrix {
     public function calculPrix($data) {
         $prix = 0;
+        // dd($data);
         $menuBurgers = $data->getMenuBurgers();
-        $frites = $data->getFrites();
-        $boissons = $data->getTailles();
+        $menuFrites = $data->getMenuFrites();
+        $menuTailles = $data->getMenuTailles();
         foreach ($menuBurgers as $burger) {
             $prix += $burger->getQuantite() * $burger->getBurgers()->getPrix();
         }
-        foreach ($frites as $frite) {
-            $prix += $frite->getPrix();
+        foreach ($menuFrites as $frite) {
+            $prix += $frite->getFrites()->getPrix();
         }
-        foreach ($boissons as $boisson) {
-            $prix += $boisson->getPrix();
+        foreach ($menuTailles as $taille) {
+            $prix += $taille->getTailles()->getPrix();
         }
         return $prix;
     }

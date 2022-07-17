@@ -35,10 +35,14 @@ class Boisson extends Produit {
     #[ORM\ManyToOne(targetEntity: Complement::class, inversedBy: 'boissons')]
     private $complement;
 
+    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: BoissonTailleBoisson::class)]
+    private $boissonTailleBoissons;
+
     public function __construct() {
         parent::__construct();
         $this->menus = new ArrayCollection();
         $this->tailles = new ArrayCollection();
+        $this->boissonTailleBoissons = new ArrayCollection();
     }
 
     /**
@@ -68,6 +72,33 @@ class Boisson extends Produit {
 
     public function setComplement(?Complement $complement): self {
         $this->complement = $complement;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BoissonTailleBoisson>
+     */
+    public function getBoissonTailleBoissons(): Collection {
+        return $this->boissonTailleBoissons;
+    }
+
+    public function addBoissonTailleBoisson(BoissonTailleBoisson $boissonTailleBoisson): self {
+        if (!$this->boissonTailleBoissons->contains($boissonTailleBoisson)) {
+            $this->boissonTailleBoissons[] = $boissonTailleBoisson;
+            $boissonTailleBoisson->setBoisson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoissonTailleBoisson(BoissonTailleBoisson $boissonTailleBoisson): self {
+        if ($this->boissonTailleBoissons->removeElement($boissonTailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($boissonTailleBoisson->getBoisson() === $this) {
+                $boissonTailleBoisson->setBoisson(null);
+            }
+        }
 
         return $this;
     }

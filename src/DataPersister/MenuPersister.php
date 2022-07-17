@@ -55,7 +55,6 @@ class MenuPersister implements DataPersisterInterface {
     }
 
     public function persist($data) {
-        // dd($this->calcul->calculPrix($data));
         $body = $this->decoder->decode($data::class, $this->decoder::FORMAT);
         $menuBurger = new MenuBurger();
         $menuTaille = new MenuTailleBoisson();
@@ -68,13 +67,14 @@ class MenuPersister implements DataPersisterInterface {
                 $menuBurger->setBurgers($this->burgerRepo->findOneBy(['id' => $id]));
             }
         }
-        foreach ($body['menuTailleBoisson'] as $taille) {
+        foreach ($body['menuTailles'] as $taille) {
+            // dd($taille['tailles']);
             $menuTaille->setQuantite($taille['quantite']);
             foreach ($taille['tailles'] as $id) {
                 $menuTaille->setTailles($this->tailleRepo->findOneBy(['id' => $id]));
             }
         }
-        foreach ($body['menuPortionFrite'] as $frite) {
+        foreach ($body['menuFrites'] as $frite) {
             $menuFrite->setQuantite($frite['quantite']);
             foreach ($frite['frites'] as $id) {
                 $menuFrite->setFrites($this->friteRepo->findOneBy(['id' => $id]));
@@ -84,6 +84,7 @@ class MenuPersister implements DataPersisterInterface {
         $data->addMenuTaille($menuTaille);
         $data->setGestionnaire($this->security->getUser());
         $data->setPrix($this->calcul->calculPrix($data));
+        // dd($data);
         $this->em->persist($data);
         $this->em->flush();
     }

@@ -29,7 +29,7 @@ class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'menu:taille:write'])]
+    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'menu:taille:write', 'orders:write', 'orders:read', 'orders:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
@@ -49,10 +49,14 @@ class TailleBoisson {
     #[ORM\OneToMany(mappedBy: 'tailles', targetEntity: MenuTailleBoisson::class)]
     private $menuTailleBoissons;
 
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: BoissonTailleBoisson::class)]
+    private $boissonTailleBoissons;
+
     public function __construct() {
         $this->boissons = new ArrayCollection();
         $this->menus = new ArrayCollection();
         $this->menuTailleBoissons = new ArrayCollection();
+        $this->boissonTailleBoissons = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -124,6 +128,33 @@ class TailleBoisson {
             // set the owning side to null (unless already changed)
             if ($menuTailleBoisson->getTailles() === $this) {
                 $menuTailleBoisson->setTailles(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BoissonTailleBoisson>
+     */
+    public function getBoissonTailleBoissons(): Collection {
+        return $this->boissonTailleBoissons;
+    }
+
+    public function addBoissonTailleBoisson(BoissonTailleBoisson $boissonTailleBoisson): self {
+        if (!$this->boissonTailleBoissons->contains($boissonTailleBoisson)) {
+            $this->boissonTailleBoissons[] = $boissonTailleBoisson;
+            $boissonTailleBoisson->setTaille($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoissonTailleBoisson(BoissonTailleBoisson $boissonTailleBoisson): self {
+        if ($this->boissonTailleBoissons->removeElement($boissonTailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($boissonTailleBoisson->getTaille() === $this) {
+                $boissonTailleBoisson->setTaille(null);
             }
         }
 

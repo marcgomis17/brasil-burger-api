@@ -46,7 +46,7 @@ class Menu {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:read', 'menu:read:post', 'orders:write'])]
+    #[Groups(['menu:read', 'menu:read:post', 'orders:write', 'orders:read', 'orders:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
@@ -94,11 +94,15 @@ class Menu {
     #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'menus')]
     private $commandes;
 
+    #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuCommande::class)]
+    private $menuCommandes;
+
     public function __construct() {
         $this->commandes = new ArrayCollection();
         $this->menuBurgers = new ArrayCollection();
         $this->menuFrites = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
+        $this->menuCommandes = new ArrayCollection();
     }
 
     /**
@@ -146,22 +150,6 @@ class Menu {
         return $this->commandes;
     }
 
-    public function addCommande(Commande $commande): self {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes[] = $commande;
-            $commande->addMenu($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommande(Commande $commande): self {
-        if ($this->commandes->removeElement($commande)) {
-            $commande->removeMenu($this);
-        }
-
-        return $this;
-    }
 
     public function getGestionnaire(): ?Gestionnaire {
         return $this->gestionnaire;
@@ -267,6 +255,33 @@ class Menu {
             // set the owning side to null (unless already changed)
             if ($menuTaille->getMenu() === $this) {
                 $menuTaille->setMenu(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MenuCommande>
+     */
+    public function getMenuCommandes(): Collection {
+        return $this->menuCommandes;
+    }
+
+    public function addMenuCommande(MenuCommande $menuCommande): self {
+        if (!$this->menuCommandes->contains($menuCommande)) {
+            $this->menuCommandes[] = $menuCommande;
+            $menuCommande->setMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenuCommande(MenuCommande $menuCommande): self {
+        if ($this->menuCommandes->removeElement($menuCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($menuCommande->getMenu() === $this) {
+                $menuCommande->setMenu(null);
             }
         }
 

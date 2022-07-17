@@ -29,11 +29,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['users:read', 'orders:write', 'product:write', 'menu:write', 'product:read', 'product:read:post'])]
+    #[Groups(['users:read', 'product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'orders:write'])]
     private $id;
 
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['users:write', 'users:read', 'menu:read:post'])]
+    private $prenom;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['users:write', 'users:read', 'menu:read:post'])]
+    private $nom;
+
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(['users:write', 'users:read'])]
+    #[Groups(['users:write', 'users:read', 'menu:read:post'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
@@ -46,14 +54,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Column(type: 'string')]
     #[Groups(['users:read'])]
     private $password;
-
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read'])]
-    private $prenom;
-
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read'])]
-    private $nom;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $isVerified;

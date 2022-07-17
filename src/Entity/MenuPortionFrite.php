@@ -37,16 +37,16 @@ class MenuPortionFrite {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:frites:read', 'menu:frites:read:post'])]
+    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:frites:read', 'menu:frites:read:post', 'menu:frite:write'])]
+    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: PortionFrite::class, inversedBy: 'menuPortionFrites')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:frites:read', 'menu:frites:read:post', 'menu:frite:write'])]
+    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     #[Assert\Valid()]
     private $frites;
 

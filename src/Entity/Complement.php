@@ -80,31 +80,4 @@ class Complement {
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, PortionFrite>
-     */
-    public function getFrites(): Collection {
-        return $this->frites;
-    }
-
-    public function addFrite(PortionFrite $frite): self {
-        if (!$this->frites->contains($frite)) {
-            $this->frites[] = $frite;
-            $frite->setComplement($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFrite(PortionFrite $frite): self {
-        if ($this->frites->removeElement($frite)) {
-            // set the owning side to null (unless already changed)
-            if ($frite->getComplement() === $this) {
-                $frite->setComplement(null);
-            }
-        }
-
-        return $this;
-    }
 }

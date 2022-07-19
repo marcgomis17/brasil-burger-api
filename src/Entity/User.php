@@ -29,19 +29,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['users:read', 'product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'orders:write'])]
+    // #[Groups(['users:read', 'product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'orders:write'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read', 'menu:read:post'])]
+    // #[Groups(['users:write', 'users:read', 'menu:read:post'])]
     private $prenom;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read', 'menu:read:post'])]
+    // #[Groups(['users:write', 'users:read', 'menu:read:post'])]
     private $nom;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(['users:write', 'users:read', 'menu:read:post'])]
+    // #[Groups(['users:write', 'users:read', 'menu:read:post'])]
     private $email;
 
     #[ORM\Column(type: 'json')]

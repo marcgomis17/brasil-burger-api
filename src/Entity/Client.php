@@ -2,32 +2,33 @@
 
 namespace App\Entity;
 
+use App\DTO\ClientInput;
+use App\DTO\ClientOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ApiResource(
+    input: ClientInput::class,
+    output: ClientOutput::class,
     collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['users:read']]
-        ],
-        'post' => [
-            'denormalization_context' => ['groups' => ['users:write']],
-            'normalization_context' => ['groups' => ['users:read:post']]
-        ],
+        'get',
+        'post'
+    ],
+    itemOperations: [
+        'get',
+        'put',
+        'patch'
     ]
 )]
 class Client extends User {
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read', 'users:read:post'])]
     private $adresse;
 
     #[ORM\Column(type: 'string', length: 30, nullable: true)]
-    #[Groups(['users:write', 'users:read', 'users:read:post'])]
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]

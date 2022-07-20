@@ -2,23 +2,21 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\GestionnaireRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\DTO\GestionnaireInput;
+use App\DTO\GestionnaireOutput;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\GestionnaireRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: GestionnaireRepository::class)]
 #[ApiResource(
+    input: GestionnaireInput::class,
+    output: GestionnaireOutput::class,
     collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['users:read']],
-        ],
-        'post' => [
-            'denormalization_context' => ['groups' => ['users:write']],
-            'normalization_context' => ['groups' => ['users:read:post']]
-
-        ]
+        'get',
+        'post'
     ]
 )]
 class Gestionnaire extends User {

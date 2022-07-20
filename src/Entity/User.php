@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use DateTime;
+use App\DTO\UserInput;
+use App\DTO\UserOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
@@ -24,7 +26,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         "livreur" => "Livreur",
     ]
 )]
-#[ApiResource()]
+#[ApiResource(input: UserInput::class, output: UserOutput::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\DTO\BurgerInput;
+use App\DTO\BurgerOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BurgerRepository;
 use Doctrine\Common\Collections\Collection;
@@ -10,16 +12,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: BurgerRepository::class)]
 #[ApiResource(
+    input: BurgerInput::class,
+    output: BurgerOutput::class,
     collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['product:read']],
-        ],
+        'get',
         'post' => [
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
-            ],
-            'denormalization_context' => ['groups' => ['product:write']],
-            'normalization_context' => ['groups' => ['product:read:post']],
+            ]
         ]
     ],
     itemOperations: [
@@ -78,13 +78,11 @@ class Burger extends Produit {
     /**
      * @return Collection<int, BurgerCommande>
      */
-    public function getBurgerCommandes(): Collection
-    {
+    public function getBurgerCommandes(): Collection {
         return $this->burgerCommandes;
     }
 
-    public function addBurgerCommande(BurgerCommande $burgerCommande): self
-    {
+    public function addBurgerCommande(BurgerCommande $burgerCommande): self {
         if (!$this->burgerCommandes->contains($burgerCommande)) {
             $this->burgerCommandes[] = $burgerCommande;
             $burgerCommande->setBurger($this);
@@ -93,14 +91,31 @@ class Burger extends Produit {
         return $this;
     }
 
-    public function removeBurgerCommande(BurgerCommande $burgerCommande): self
-    {
+    public function removeBurgerCommande(BurgerCommande $burgerCommande): self {
         if ($this->burgerCommandes->removeElement($burgerCommande)) {
             // set the owning side to null (unless already changed)
             if ($burgerCommande->getBurger() === $this) {
                 $burgerCommande->setBurger(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of menus
+     */
+    public function getMenus() {
+        return $this->menus;
+    }
+
+    /**
+     * Set the value of menus
+     *
+     * @return  self
+     */
+    public function setMenus($menus) {
+        $this->menus = $menus;
 
         return $this;
     }

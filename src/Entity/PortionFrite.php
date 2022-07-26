@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\DTO\PortionFriteInput;
+use App\DTO\PortionFriteOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PortionFriteRepository;
 use Doctrine\Common\Collections\Collection;
@@ -11,32 +13,29 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PortionFriteRepository::class)]
 #[ApiResource(
+    input: PortionFriteInput::class,
+    output: PortionFriteOutput::class,
     collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['product:read']],
-        ],
+        'get',
         'post' => [
-            'input_formats' => [
+            /* 'input_formats' => [
                 'multipart' => ['multipart/form-data'],
-            ],
-            'denormalization_context' => ['groups' => ['product:write']]
+            ], */
+            // 'denormalization_context' => ['groups' => ['product:write']]
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['product:write']],
         ],
         'patch' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['product:write']],
         ]
     ]
 )]
 class PortionFrite extends Produit {
     #[ORM\Column(type: 'string', length: 70)]
-    #[Groups(['product:read', 'product:write', 'menu:read:post'])]
     private $portion;
 
     #[ORM\OneToMany(mappedBy: 'frites', targetEntity: MenuPortionFrite::class)]
@@ -100,13 +99,11 @@ class PortionFrite extends Produit {
     /**
      * @return Collection<int, PortionFriteCommande>
      */
-    public function getPortionFriteCommandes(): Collection
-    {
+    public function getPortionFriteCommandes(): Collection {
         return $this->portionFriteCommandes;
     }
 
-    public function addPortionFriteCommande(PortionFriteCommande $portionFriteCommande): self
-    {
+    public function addPortionFriteCommande(PortionFriteCommande $portionFriteCommande): self {
         if (!$this->portionFriteCommandes->contains($portionFriteCommande)) {
             $this->portionFriteCommandes[] = $portionFriteCommande;
             $portionFriteCommande->setFrite($this);
@@ -115,8 +112,7 @@ class PortionFrite extends Produit {
         return $this;
     }
 
-    public function removePortionFriteCommande(PortionFriteCommande $portionFriteCommande): self
-    {
+    public function removePortionFriteCommande(PortionFriteCommande $portionFriteCommande): self {
         if ($this->portionFriteCommandes->removeElement($portionFriteCommande)) {
             // set the owning side to null (unless already changed)
             if ($portionFriteCommande->getFrite() === $this) {

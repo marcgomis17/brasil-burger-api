@@ -5,18 +5,25 @@ namespace App\DataTransformer;
 use App\Entity\Menu;
 use App\DTO\MenuOutput;
 use App\DTO\MenuBurgerOutput;
+use App\Entity\MenuPortionFrite;
+use App\Entity\MenuTailleBoisson;
+use App\DTO\MenuTailleBoissonOutput;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
+use App\DTO\MenuPortionFriteOutput;
 
 final class MenuOutputDataTransformer implements DataTransformerInterface {
     private Menu $menu;
-    private MenuBurgerOutput $menuBurgers;
+    public MenuBurgerOutput $menuBurgers;
+    public MenuTailleBoissonOutput $MenuTailles;
+    public MenuPortionFriteOutput $menuFrites;
+
 
     public function supportsTransformation($data, string $to, array $context = []): bool {
-        return Menu::class === $to && $data instanceof Menu;
+        return MenuOutput::class === $to && $data instanceof Menu;
     }
 
     public function transform($object, string $to, array $context = []) {
-        $output = new MenuOutput($this->menu, $this->menuBurgers);
+        $output = new MenuOutput($this->menu, $this->menuBurgers, $this->menuTailles, $this->menuFrites);
         $output->id = $object->getId();
         $output->nom = $object->getNom();
         $output->prix = $object->getPrix();

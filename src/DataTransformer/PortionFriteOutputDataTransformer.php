@@ -8,7 +8,7 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 
 final class PortionFriteOutputDataTransformer implements DataTransformerInterface {
     public function supportsTransformation($data, string $to, array $context = []): bool {
-        return PortionFrite::class === $to && $data instanceof PortionFrite;
+        return PortionFriteOutput::class === $to && $data instanceof PortionFrite;
     }
 
     public function transform($object, string $to, array $context = []) {

@@ -7,6 +7,10 @@ use App\DTO\ClientOutput;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 
 final class ClientOutputDataTransformer implements DataTransformerInterface {
+    public function supportsTransformation($data, string $to, array $context = []): bool {
+        return ClientOutput::class === $to && $data instanceof Client;
+    }
+
     public function transform($object, string $to, array $context = []) {
         $output = new ClientOutput();
         $output->id = $object->getId();
@@ -16,9 +20,5 @@ final class ClientOutputDataTransformer implements DataTransformerInterface {
         $output->telephone = $object->getTelephone();
         $output->adresse = $object->getAdresse();
         return $output;
-    }
-
-    public function supportsTransformation($data, string $to, array $context = []): bool {
-        return ClientOutput::class === $to && $data instanceof Client;
     }
 }

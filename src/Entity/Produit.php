@@ -104,7 +104,7 @@ class Produit {
     }
 
     public function getImage() {
-        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8'); // FIXME: stream_get_contents parameter[#1] must be a resource, string given
+        return base64_encode(stream_get_contents($this->image));
     }
 
     public function setImage($image): self {

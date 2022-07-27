@@ -8,7 +8,7 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 
 final class TailleBoissonOutputDataTransformer implements DataTransformerInterface {
     public function supportsTransformation($data, string $to, array $context = []): bool {
-        return TailleBoisson::class === $to && $data instanceof TailleBoisson;
+        return TailleBoissonOutput::class === $to && $data instanceof TailleBoisson;
     }
 
     public function transform($object, string $to, array $context = []) {

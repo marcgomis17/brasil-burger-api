@@ -8,7 +8,7 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 
 class ProduitOutputDataTransformer implements DataTransformerInterface {
     public function supportsTransformation($data, string $to, array $context = []): bool {
-        return Produit::class === $to && $data instanceof Produit;
+        return ProduitOutput::class === $to && $data instanceof Produit;
     }
 
     public function transform($object, string $to, array $context = []) {

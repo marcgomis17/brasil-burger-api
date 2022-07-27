@@ -3,10 +3,6 @@
 namespace App\DTO;
 
 use App\Entity\Menu;
-use App\Entity\MenuBurger;
-use App\Entity\MenuPortionFrite;
-use App\Entity\MenuTailleBoisson;
-use Doctrine\Common\Collections\ArrayCollection;
 
 final class MenuOutput {
     public int $id;
@@ -14,10 +10,10 @@ final class MenuOutput {
     public int $prix;
     public $image;
     public MenuBurgerOutput $menuBurgers;
-    public MenuTailleBoisson $MenuTailles;
-    public MenuPortionFrite $menuFrites;
+    public MenuTailleBoissonOutput $MenuTailles;
+    public MenuPortionFriteOutput $menuFrites;
 
-    public function __construct(Menu $menu, MenuBurgerInput $menuBurger, MenuTailleBoissonInput $menuTailleBoisson, MenuPortionFriteInput $menuFrite) {
+    public function __construct(Menu $menu, MenuBurgerOutput $menuBurger, MenuTailleBoissonOutput $menuTailleBoisson, MenuPortionFriteOutput $menuFrite) {
         $this->id = $menu->getId();
         $this->menuBurgers = $menuBurger;
         $this->menuTailles = $menuTailleBoisson;

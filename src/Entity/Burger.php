@@ -32,18 +32,13 @@ use Doctrine\Common\Collections\ArrayCollection;
     ]
 )]
 class Burger extends Produit {
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'burgers')]
-    private $menus;
-
-    #[ORM\OneToMany(mappedBy: 'burgers', targetEntity: MenuBurger::class)]
+    #[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
     private $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class)]
     private $burgerCommandes;
 
     public function __construct() {
-        parent::__construct();
-        $this->menus = new ArrayCollection();
         $this->menuBurgers = new ArrayCollection();
         $this->burgerCommandes = new ArrayCollection();
     }
@@ -98,24 +93,6 @@ class Burger extends Produit {
                 $burgerCommande->setBurger(null);
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * Get the value of menus
-     */
-    public function getMenus() {
-        return $this->menus;
-    }
-
-    /**
-     * Set the value of menus
-     *
-     * @return  self
-     */
-    public function setMenus($menus) {
-        $this->menus = $menus;
 
         return $this;
     }

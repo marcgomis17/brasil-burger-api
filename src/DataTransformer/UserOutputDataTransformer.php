@@ -7,6 +7,10 @@ use App\DTO\UserOutput;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 
 final class UserOutputDataTransformer implements DataTransformerInterface {
+    public function supportsTransformation($data, string $to, array $context = []): bool {
+        return UserOutput::class === $to && $data instanceof User;
+    }
+
     public function transform($object, string $to, array $context = []) {
         $output = new UserOutput();
         $output->id = $object->getId();
@@ -14,9 +18,5 @@ final class UserOutputDataTransformer implements DataTransformerInterface {
         $output->nom = $object->getNom();
         $output->email = $object->getEmail();
         return $output;
-    }
-
-    public function supportsTransformation($data, string $to, array $context = []): bool {
-        return UserOutput::class === $to && $data instanceof User;
     }
 }

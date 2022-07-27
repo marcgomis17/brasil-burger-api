@@ -11,7 +11,7 @@ class ImageUploader {
 
     public function upload($image) {
         $this->denormalizer->denormalize($image, String::class);
-        $blob = base64_encode(file_get_contents($image));
+        $blob = file_get_contents($image);
         return $blob;
     }
 }

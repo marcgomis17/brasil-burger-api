@@ -14,7 +14,7 @@ final class MenuBurgerOutputDataTransformer implements DataTransformerInterface 
         if ($data instanceof MenuBurger) {
             return false;
         }
-        return MenuBurger::class === $to && $data instanceof MenuBurger;
+        return MenuBurgerOutput::class === $to && $data instanceof MenuBurger;
     }
 
     public function transform($object, string $to, array $context = []) {

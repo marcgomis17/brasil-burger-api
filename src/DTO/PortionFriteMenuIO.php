@@ -2,6 +2,6 @@
 
 namespace App\DTO;
 
-final class BurgerMenuOutput {
+final class PortionFriteMenuIO {
     public int $id;
 }

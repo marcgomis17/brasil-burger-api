@@ -2,92 +2,49 @@
 
 namespace App\Entity;
 
+use App\DTO\MenuInput;
+use App\DTO\MenuOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Positive;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 #[ApiResource(
+    input: MenuInput::class,
+    output: MenuOutput::class,
     collectionOperations: [
-        'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['menu:read']],
-        ],
+        'get',
         'post' => [
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:write']],
-            'normalization_context' => ['groups' => ['menu:read:post']],
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:write']],
         ],
         'patch' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:write']],
         ]
     ]
 )]
-class Menu {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:read', 'menu:read:post', 'orders:write', 'orders:read', 'orders:read:post'])]
-    private $id;
-
-    #[ORM\Column(type: 'string', length: 100, unique: true)]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
-    #[Assert\NotBlank()]
-    private $nom;
-
-    #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:read', 'menu:read:post'])]
-    #[Assert\All(
-        [
-            new Assert\NotBlank(),
-            new Assert\Positive()
-        ]
-    )]
-    private $prix;
-
-    #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'menus')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
-    private $gestionnaire;
-
-    #[ORM\Column(type: 'blob')]
-    private $image;
-
-    // #[Groups(['menu:write'])]
-    #[SerializedName('image')]
-    private ?File $file;
-
+class Menu extends Produit {
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
-    #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
     #[Assert\Count(min: 1)]
     private $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuPortionFrite::class, cascade: ["persist"])]
-    #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
     #[Assert\Count(min: 1)]
     private $menuFrites;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTailleBoisson::class, cascade: ["persist"])]
-    #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
     #[Assert\Count(min: 1)]
     private $menuTailles;
 
@@ -106,44 +63,6 @@ class Menu {
     }
 
     /**
-     * Get the value of id
-     */
-    public function getId() {
-        return $this->id;
-    }
-
-    /**
-     * Set the value of id
-     *
-     * @return  self
-     */
-    public function setId($id) {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function getNom(): ?string {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): self {
-        $this->nom = $nom;
-
-        return $this;
-    }
-
-    public function getPrix(): ?int {
-        return $this->prix;
-    }
-
-    public function setPrix(int $prix): self {
-        $this->prix = $prix;
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Commande>
      */
     public function getCommandes(): Collection {
@@ -157,34 +76,6 @@ class Menu {
 
     public function setGestionnaire(?Gestionnaire $gestionnaire): self {
         $this->gestionnaire = $gestionnaire;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of file
-     */
-    public function getFile() {
-        return $this->file;
-    }
-
-    /**
-     * Set the value of file
-     *
-     * @return  self
-     */
-    public function setFile($file) {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    public function getImage() {
-        return $this->image;
-    }
-
-    public function setImage($image): self {
-        $this->image = $image;
 
         return $this;
     }

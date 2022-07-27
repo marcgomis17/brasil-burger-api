@@ -2,6 +2,6 @@
 
 namespace App\DTO;
 
-final class BurgerMenuInput {
+final class BurgerMenuIO {
     public int $id;
 }

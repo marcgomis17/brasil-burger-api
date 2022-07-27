@@ -2,6 +2,6 @@
 
 namespace App\DTO;
 
-final class TailleBoissonMenuInput {
+final class TailleBoissonMenuIO {
     public int $id;
 }

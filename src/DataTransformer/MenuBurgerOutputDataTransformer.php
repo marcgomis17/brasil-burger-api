@@ -5,10 +5,10 @@ namespace App\DataTransformer;
 use App\Entity\MenuBurger;
 use App\DTO\MenuBurgerOutput;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use App\DTO\BurgerMenuOutput;
+use App\DTO\BurgerMenuIO;
 
 final class MenuBurgerOutputDataTransformer implements DataTransformerInterface {
-    private BurgerMenuOutput $burgerMenuOutput;
+    private BurgerMenuIO $burgerMenuOutput;
 
     public function supportsTransformation($data, string $to, array $context = []): bool {
         if ($data instanceof MenuBurger) {

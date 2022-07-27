@@ -5,9 +5,9 @@ namespace App\DTO;
 final class MenuBurgerOutput {
     public int $id;
     public int $quantite;
-    public BurgerMenuOutput $burger;
+    public BurgerMenuIO $burger;
 
-    public function __construct(BurgerMenuOutput $burgerMenuOutput) {
+    public function __construct(BurgerMenuIO $burgerMenuOutput) {
         $this->burger = $burgerMenuOutput;
     }
 }

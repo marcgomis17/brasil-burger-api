@@ -6,9 +6,9 @@ use App\Entity\MenuBurger;
 
 final class MenuBurgerInput {
     public int $quantite;
-    public BurgerMenuInput $burger;
+    public BurgerMenuIO $burger;
 
-    public function __construct(BurgerMenuInput $burgerMenuInput) {
+    public function __construct(BurgerMenuIO $burgerMenuInput) {
         $this->burger = $burgerMenuInput;
     }
 }

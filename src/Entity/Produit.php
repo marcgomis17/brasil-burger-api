@@ -3,15 +3,16 @@
 namespace App\Entity;
 
 use App\DTO\ProduitInput;
+use App\DTO\ProduitOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\DTO\ProduitOutput;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
@@ -21,6 +22,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[DiscriminatorMap(
     [
         "burger" => "Burger",
+        "menu" => "Menu",
         "boisson" => "Boisson",
         "portion_frite" => "PortionFrite"
     ]
@@ -30,12 +32,10 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    // #[Groups(['product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'menu:burger:write', 'orders:write', 'menu:frite:write', 'menu:taille:write', 'orders:write', 'orders:read', 'orders:read:post'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    // #[Groups(['product:read', 'product:read:post', 'product:write', 'menu:read:post', 'menu:burger:read:post'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -45,28 +45,23 @@ class Produit {
             new Assert\Positive()
         ]
     )]
-    // #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'menu:burger:read:post'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    // #[Groups(['product:read', 'product:read:post'])]
     protected $image;
 
     #[ORM\Column(type: 'boolean', nullable: false)]
-    // #[Groups(['product:read:post'])]
     protected $isAvailable;
 
-    // #[Groups(['product:write'])]
     #[SerializedName('image')]
+    // #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
     private ?File $file;
 
     #[SerializedName(('prix'))]
-    // #[Groups(['product:write'])]
     private $sPrix;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
-    // #[Groups(['product:read', 'product:write', 'product:read:post'])]
     private $gestionnaire;
 
     public function __construct() {

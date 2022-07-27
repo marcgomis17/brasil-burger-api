@@ -13,6 +13,9 @@ final class LivreurOutputDataTransformer implements DataTransformerInterface {
 
     public function transform($object, string $to, array $context = []) {
         $output = new LivreurOutput();
+        $output->prenom = $object->getPrenom();
+        $output->nom = $object->getNom();
+        $output->email = $object->getEmail();
         $output->matriculeMoto = $object->getMatriculeMoto();
         return $output;
     }

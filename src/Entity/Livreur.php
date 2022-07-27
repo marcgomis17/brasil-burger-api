@@ -2,27 +2,30 @@
 
 namespace App\Entity;
 
+use App\DTO\LivreurInput;
+use App\DTO\LivreurOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreurRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
 #[ApiResource(
+    input: LivreurInput::class,
+    output: LivreurOutput::class,
     collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['users:read']],
-        ],
-        'post' => [
-            'denormalization_context' => ['groups' => ['users:write']]
-        ]
+        'get',
+        'post'
+    ],
+    itemOperations: [
+        'get',
+        'put',
+        'patch'
     ]
 )]
 class Livreur extends User {
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['users:write', 'users:read'])]
     private $matriculeMoto;
 
     #[ORM\Column(type: 'boolean')]

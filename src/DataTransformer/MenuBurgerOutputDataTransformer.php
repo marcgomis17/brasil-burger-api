@@ -5,8 +5,11 @@ namespace App\DataTransformer;
 use App\Entity\MenuBurger;
 use App\DTO\MenuBurgerOutput;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
+use App\DTO\BurgerMenuOutput;
 
 final class MenuBurgerOutputDataTransformer implements DataTransformerInterface {
+    private BurgerMenuOutput $burgerMenuOutput;
+
     public function supportsTransformation($data, string $to, array $context = []): bool {
         if ($data instanceof MenuBurger) {
             return false;
@@ -15,10 +18,9 @@ final class MenuBurgerOutputDataTransformer implements DataTransformerInterface 
     }
 
     public function transform($object, string $to, array $context = []) {
-        $output = new MenuBurgerOutput();
+        $output = new MenuBurgerOutput($this->burgerMenuOutput);
         $output->id = $object->getId();
         $output->quantite = $object->getQuantite();
-        $output->burger = $object->getBurger()->getId();
         return $output;
     }
 }

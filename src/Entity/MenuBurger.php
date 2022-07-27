@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\DTO\MenuBurgerInput;
+use App\DTO\MenuBurgerOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuBurgerRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -10,26 +12,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuBurgerRepository::class)]
 #[ApiResource(
+    input: MenuBurgerInput::class,
+    output: MenuBurgerOutput::class,
     collectionOperations: [
-        'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['menu:burger:read']],
-        ],
+        'get',
         'post' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:burger:write']],
-            'normalization_context' => ['groups' => ['menu:burger:read:post']],
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:burger:write']],
         ],
         'patch' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:burger:write']],
         ]
     ]
 )]
@@ -49,18 +46,18 @@ class MenuBurger {
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\Valid()]
     #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
-    private $burgers;
+    private $burger;
 
     public function getId(): ?int {
         return $this->id;
     }
 
-    public function getBurgers(): ?Burger {
-        return $this->burgers;
+    public function getBurger(): ?Burger {
+        return $this->burger;
     }
 
-    public function setBurgers(?Burger $burgers): self {
-        $this->burgers = $burgers;
+    public function setBurger(?Burger $burger): self {
+        $this->burger = $burger;
 
         return $this;
     }

@@ -3,33 +3,29 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\DTO\MenuTailleBoissonInput;
+use App\DTO\MenuTailleBoissonOutput;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MenuTailleBoissonRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuTailleBoissonRepository::class)]
 #[ApiResource(
+    input: MenuTailleBoissonInput::class,
+    output: MenuTailleBoissonOutput::class,
     collectionOperations: [
-        'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['menu:taille:read']],
-        ],
+        'get',
         'post' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:taille:write']],
-            'normalization_context' => ['groups' => ['menu:taille:read:post']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:taille:write']],
         ],
         'patch' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:taille:write']],
         ]
     ]
 )]
@@ -37,17 +33,14 @@ class MenuTailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'menuTailleBoissons')]
     #[Assert\Valid()]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     private $tailles;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]

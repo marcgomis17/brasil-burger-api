@@ -2,101 +2,57 @@
 
 namespace App\Entity;
 
+use App\DTO\BoissonInput;
+use App\DTO\BoissonOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BoissonRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
 #[ApiResource(
+    input: BoissonInput::class,
+    output: BoissonOutput::class,
     collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['product:read']],
-        ],
+        'get',
         'post' => [
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
-            'denormalization_context' => ['groups' => ['product:write']],
-            'normalization_context' => ['groups' => ['product:read:post']],
         ]
     ]
 )]
 class Boisson extends Produit {
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'boissons')]
-    private $menus;
-
-    #[ORM\ManyToMany(targetEntity: TailleBoisson::class, inversedBy: 'boissons')]
-    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:read:post'])]
-    private $tailles;
-
-    #[ORM\ManyToOne(targetEntity: Complement::class, inversedBy: 'boissons')]
-    private $complement;
-
-    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: BoissonTailleBoisson::class)]
-    private $boissonTailleBoissons;
+    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: BoissonTaille::class)]
+    private $boissonTaille;
 
     public function __construct() {
         parent::__construct();
-        $this->menus = new ArrayCollection();
-        $this->tailles = new ArrayCollection();
-        $this->boissonTailleBoissons = new ArrayCollection();
+        $this->boissonTaille = new ArrayCollection();
     }
 
     /**
-     * @return Collection<int, TailleBoisson>
-     */
-    public function getTailles(): Collection {
-        return $this->tailles;
-    }
-
-    public function addTaille(TailleBoisson $taille): self {
-        if (!$this->tailles->contains($taille)) {
-            $this->tailles[] = $taille;
-        }
-
-        return $this;
-    }
-
-    public function removeTaille(TailleBoisson $taille): self {
-        $this->tailles->removeElement($taille);
-
-        return $this;
-    }
-
-    public function getComplement(): ?Complement {
-        return $this->complement;
-    }
-
-    public function setComplement(?Complement $complement): self {
-        $this->complement = $complement;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, BoissonTailleBoisson>
+     * @return Collection<int, BoissonTaille>
      */
     public function getBoissonTailleBoissons(): Collection {
-        return $this->boissonTailleBoissons;
+        return $this->boissonTaille;
     }
 
-    public function addBoissonTailleBoisson(BoissonTailleBoisson $boissonTailleBoisson): self {
-        if (!$this->boissonTailleBoissons->contains($boissonTailleBoisson)) {
-            $this->boissonTailleBoissons[] = $boissonTailleBoisson;
-            $boissonTailleBoisson->setBoisson($this);
+    public function addBoissonTailleBoisson(BoissonTaille $BoissonTaille): self {
+        if (!$this->boissonTaille->contains($BoissonTaille)) {
+            $this->boissonTaille[] = $BoissonTaille;
+            $BoissonTaille->setBoisson($this);
         }
 
         return $this;
     }
 
-    public function removeBoissonTailleBoisson(BoissonTailleBoisson $boissonTailleBoisson): self {
-        if ($this->boissonTailleBoissons->removeElement($boissonTailleBoisson)) {
+    public function removeBoissonTailleBoisson(BoissonTaille $BoissonTaille): self {
+        if ($this->boissonTaille->removeElement($BoissonTaille)) {
             // set the owning side to null (unless already changed)
-            if ($boissonTailleBoisson->getBoisson() === $this) {
-                $boissonTailleBoisson->setBoisson(null);
+            if ($BoissonTaille->getBoisson() === $this) {
+                $BoissonTaille->setBoisson(null);
             }
         }
 

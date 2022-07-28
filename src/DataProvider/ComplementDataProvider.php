@@ -30,9 +30,5 @@ final class ComplementDataProvider implements ContextAwareCollectionDataProvider
         foreach ($boissons as $boisson) {
             $complement->addBoisson($boisson);
         }
-        foreach ($frites as $frite) {
-            $complement->addFrite($frite);
-        }
-        return new ArrayCollection(array('boissons' => $complement->getBoissons(), 'frites' => $complement->getFrites()));
     }
 }

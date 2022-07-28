@@ -2,11 +2,11 @@
 
 namespace App\DataProvider;
 
+use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+use App\Entity\Catalogue;
 use App\Repository\MenuRepository;
 use App\Repository\BurgerRepository;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use App\Entity\Catalogue;
 
 final class CatalogueDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
     private $burgerRepo;
@@ -18,8 +18,17 @@ final class CatalogueDataProvider implements ContextAwareCollectionDataProviderI
     }
 
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool {
-        return $resourceClass == Catalogue::class;
+        return $resourceClass === Catalogue::class;
     }
+
+    /* public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = []): ?Catalogue {
+        $catalogue = new Catalogue();
+        $burgers = $this->burgerRepo->findBy(['isAvailable' => true]);
+        $menus = $this->menuRepo->findBy(['isAvailable' => true]);
+        $catalogue->setBurgers($burgers);
+        $catalogue->setMenus($menus);
+        return $catalogue;
+    } */
 
     public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []) {
         $burgers = $this->burgerRepo->findBy(['isAvailable' => true]);

@@ -32,10 +32,12 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['product:read', 'menu:write', 'menu:read'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
+    #[Groups(['product:write', 'product:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -45,19 +47,22 @@ class Produit {
             new Assert\Positive()
         ]
     )]
+    #[Groups(['product:read'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
+    #[Groups(['product:read'])]
     protected $image;
 
     #[ORM\Column(type: 'boolean', nullable: false)]
     protected $isAvailable;
 
     #[SerializedName('image')]
-    // #[Groups(['menu:read', 'menu:write', 'menu:read:post'])]
+    #[Groups(['product:write'])]
     private ?File $file;
 
     #[SerializedName(('prix'))]
+    #[Groups(['product:write'])]
     private $sPrix;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]

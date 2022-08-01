@@ -7,12 +7,13 @@ use App\DTO\MenuTailleBoissonInput;
 use App\DTO\MenuTailleBoissonOutput;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MenuTailleBoissonRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuTailleBoissonRepository::class)]
 #[ApiResource(
-    input: MenuTailleBoissonInput::class,
-    output: MenuTailleBoissonOutput::class,
+    /* input: MenuTailleBoissonInput::class,
+    output: MenuTailleBoissonOutput::class, */
     collectionOperations: [
         'get',
         'post' => [
@@ -37,10 +38,12 @@ class MenuTailleBoisson {
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
+    #[Groups(['menu:write', 'menu:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'menuTailleBoissons')]
     #[Assert\Valid()]
+    #[Groups(['menu:write', 'menu:read'])]
     private $tailles;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]

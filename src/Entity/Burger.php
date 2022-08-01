@@ -12,14 +12,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: BurgerRepository::class)]
 #[ApiResource(
-    input: BurgerInput::class,
-    output: BurgerOutput::class,
+    /* input: BurgerInput::class,
+    output: BurgerOutput::class, */
     collectionOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['product:read']],
+        ],
         'post' => [
+            "denormalization_context" => ["groups" => ['product:write']],
+            "normalization_context" => ["groups" => ['product:read']],
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
-            ]
+            ],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ],
     itemOperations: [
@@ -28,6 +33,7 @@ use Doctrine\Common\Collections\ArrayCollection;
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ],
     ]
 )]

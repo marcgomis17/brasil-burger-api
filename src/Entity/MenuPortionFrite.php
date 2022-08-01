@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuPortionFriteRepository::class)]
 #[ApiResource(
-    input: MenuPortionFriteInput::class,
-    output: MenuPortionFriteOutput::class,
+    /* input: MenuPortionFriteInput::class,
+    output: MenuPortionFriteOutput::class, */
     collectionOperations: [
         'get',
         'post' => [
@@ -38,10 +38,12 @@ class MenuPortionFrite {
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
+    #[Groups(['menu:write', 'menu:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: PortionFrite::class, inversedBy: 'menuPortionFrites')]
     #[Assert\Valid()]
+    #[Groups(['menu:write', 'menu:read'])]
     private $frites;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuFrites')]

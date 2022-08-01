@@ -12,15 +12,29 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
 #[ApiResource(
-    input: BoissonInput::class,
-    output: BoissonOutput::class,
+    /* input: BoissonInput::class,
+    output: BoissonOutput::class, */
     collectionOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['product:read']],
+        ],
         'post' => [
+            "denormalization_context" => ["groups" => ['product:write']],
+            "normalization_context" => ["groups" => ['product:read']],
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
+    ],
+    itemOperations: [
+        'get',
+        'put' => [
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+        ],
     ]
 )]
 class Boisson extends Produit {

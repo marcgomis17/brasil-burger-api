@@ -8,17 +8,23 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 #[ApiResource(
-    input: MenuInput::class,
-    output: MenuOutput::class,
+    /* input: MenuInput::class,
+    output: MenuOutput::class, */
     collectionOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['menu:read']],
+        ],
         'post' => [
+            "denormalization_context" => ["groups" => ['menu:write']],
+            "normalization_context" => ["groups" => ['menu:read']],
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
@@ -36,17 +42,33 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 class Menu extends Produit {
+    #[Groups(['menu:read'])]
+    public $id;
+
+    #[Groups(['menu:write', 'menu:read'])]
+    public $nom;
+
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
     #[Assert\Count(min: 1)]
+    #[Groups(['menu:write', 'menu:read'])]
     private $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuPortionFrite::class, cascade: ["persist"])]
     #[Assert\Count(min: 1)]
+    #[Groups(['menu:write', 'menu:read'])]
     private $menuFrites;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTailleBoisson::class, cascade: ["persist"])]
     #[Assert\Count(min: 1)]
+    #[Groups(['menu:write', 'menu:read'])]
     private $menuTailles;
+
+    #[SerializedName('image')]
+    #[Groups(['menu:write', 'menu:read'])]
+    private ?File $file;
+
+    #[Groups(['menu:read'])]
+    protected $image;
 
     #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'menus')]
     private $commandes;
@@ -59,43 +81,6 @@ class Menu extends Produit {
         $this->menuBurgers = new ArrayCollection();
         $this->menuFrites = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
-        $this->menuCommandes = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, Commande>
-     */
-    public function getCommandes(): Collection {
-        return $this->commandes;
-    }
-
-
-    public function getGestionnaire(): ?Gestionnaire {
-        return $this->gestionnaire;
-    }
-
-    public function setGestionnaire(?Gestionnaire $gestionnaire): self {
-        $this->gestionnaire = $gestionnaire;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of menuBurgers
-     */
-    public function getMenuBurgers() {
-        return $this->menuBurgers;
-    }
-
-    /**
-     * Set the value of menuBurgers
-     *
-     * @return  self
-     */
-    public function setMenuBurgers($menuBurgers) {
-        $this->menuBurgers = $menuBurgers;
-
-        return $this;
     }
 
     /**
@@ -173,6 +158,33 @@ class Menu extends Produit {
             // set the owning side to null (unless already changed)
             if ($menuCommande->getMenu() === $this) {
                 $menuCommande->setMenu(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MenuBurger>
+     */
+    public function getMenuBurgers(): Collection {
+        return $this->menuBurgers;
+    }
+
+    public function addMenuBurger(MenuBurger $menuBurger): self {
+        if (!$this->menuBurgers->contains($menuBurger)) {
+            $this->menuBurgers[] = $menuBurger;
+            $menuBurger->setMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenuBurger(MenuBurger $menuBurger): self {
+        if ($this->menuBurgers->removeElement($menuBurger)) {
+            // set the owning side to null (unless already changed)
+            if ($menuBurger->getMenu() === $this) {
+                $menuBurger->setMenu(null);
             }
         }
 

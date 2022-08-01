@@ -13,29 +13,34 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PortionFriteRepository::class)]
 #[ApiResource(
-    input: PortionFriteInput::class,
-    output: PortionFriteOutput::class,
+    /* input: PortionFriteInput::class,
+    output: PortionFriteOutput::class, */
     collectionOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['product:read']],
+        ],
         'post' => [
-            /* 'input_formats' => [
+            "denormalization_context" => ["groups" => ['product:write']],
+            "normalization_context" => ["groups" => ['product:read']],
+            'input_formats' => [
                 'multipart' => ['multipart/form-data'],
-            ], */
-            // 'denormalization_context' => ['groups' => ['product:write']]
+            ],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ],
-        'patch' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-        ]
     ]
 )]
 class PortionFrite extends Produit {
     #[ORM\Column(type: 'string', length: 70)]
+    #[Groups(['product:write', 'product:read'])]
     private $portion;
 
     #[ORM\OneToMany(mappedBy: 'frites', targetEntity: MenuPortionFrite::class)]
@@ -45,7 +50,6 @@ class PortionFrite extends Produit {
     private $portionFriteCommandes;
 
     public function __construct() {
-        parent::__construct();
         $this->menus = new ArrayCollection();
         $this->menuPortionFrites = new ArrayCollection();
         $this->portionFriteCommandes = new ArrayCollection();

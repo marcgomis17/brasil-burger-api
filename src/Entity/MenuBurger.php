@@ -7,12 +7,13 @@ use App\DTO\MenuBurgerOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuBurgerRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuBurgerRepository::class)]
 #[ApiResource(
-    input: MenuBurgerInput::class,
-    output: MenuBurgerOutput::class,
+    /* input: MenuBurgerInput::class,
+    output: MenuBurgerOutput::class, */
     collectionOperations: [
         'get',
         'post' => [
@@ -37,11 +38,17 @@ class MenuBurger {
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
+    #[Groups(['menu:write', 'menu:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['menu:write', 'menu:read'])]
     private $burger;
+
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuBurgers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $menu;
 
     public function getId(): ?int {
         return $this->id;
@@ -57,14 +64,22 @@ class MenuBurger {
         return $this;
     }
 
-    public function getBurger(): ?Burger
-    {
+    public function getBurger(): ?Burger {
         return $this->burger;
     }
 
-    public function setBurger(?Burger $burger): self
-    {
+    public function setBurger(?Burger $burger): self {
         $this->burger = $burger;
+
+        return $this;
+    }
+
+    public function getMenu(): ?Menu {
+        return $this->menu;
+    }
+
+    public function setMenu(?Menu $menu): self {
+        $this->menu = $menu;
 
         return $this;
     }

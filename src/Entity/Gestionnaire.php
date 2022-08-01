@@ -23,13 +23,9 @@ class Gestionnaire extends User {
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
     private $produits;
 
-    #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Menu::class)]
-    private $menus;
-
     public function __construct() {
         $this->setRoles(['ROLE_GESTIONNAIRE']);
         $this->produits = new ArrayCollection();
-        $this->menus = new ArrayCollection();
         $this->setIsVerified(true);
     }
 
@@ -54,33 +50,6 @@ class Gestionnaire extends User {
             // set the owning side to null (unless already changed)
             if ($produit->getGestionnaire() === $this) {
                 $produit->setGestionnaire(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenus(): Collection {
-        return $this->menus;
-    }
-
-    public function addMenu(Menu $menu): self {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->setGestionnaire($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMenu(Menu $menu): self {
-        if ($this->menus->removeElement($menu)) {
-            // set the owning side to null (unless already changed)
-            if ($menu->getGestionnaire() === $this) {
-                $menu->setGestionnaire(null);
             }
         }
 

@@ -28,12 +28,16 @@ use Doctrine\Common\Collections\ArrayCollection;
         ]
     ],
     itemOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['product:read']],
+        ],
         'put' => [
+            "denormalization_context" => ["groups" => ['product:write']],
+            "normalization_context" => ["groups" => ['product:read']],
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ],
     ]
 )]

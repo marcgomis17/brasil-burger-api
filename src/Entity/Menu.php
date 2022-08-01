@@ -32,11 +32,17 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         ]
     ],
     itemOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['menu:read']],
+        ],
         'put' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            "denormalization_context" => ["groups" => ['menu:write']],
+            "normalization_context" => ["groups" => ['menu:read']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ],
         'patch' => [
+            "denormalization_context" => ["groups" => ['menu:write']],
+            "normalization_context" => ["groups" => ['menu:read']],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ]
@@ -64,7 +70,7 @@ class Menu extends Produit {
     private $menuTailles;
 
     #[SerializedName('image')]
-    #[Groups(['menu:write', 'menu:read'])]
+    #[Groups(['menu:write'])]
     private ?File $file;
 
     #[Groups(['menu:read'])]

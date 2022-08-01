@@ -54,9 +54,6 @@ class Produit {
     #[Groups(['product:read'])]
     protected $image;
 
-    #[ORM\Column(type: 'boolean', nullable: false)]
-    protected $isAvailable;
-
     #[SerializedName('image')]
     #[Groups(['product:write'])]
     private ?File $file;
@@ -64,6 +61,9 @@ class Produit {
     #[SerializedName(('prix'))]
     #[Groups(['product:write'])]
     private $sPrix;
+
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    protected $isAvailable;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]

@@ -3,12 +3,13 @@
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use App\Entity\Catalogue;
 use App\Repository\MenuRepository;
 use App\Repository\BurgerRepository;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
-final class CatalogueDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
+final class CatalogueDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface {
     private $burgerRepo;
     private $menuRepo;
 
@@ -21,18 +22,18 @@ final class CatalogueDataProvider implements ContextAwareCollectionDataProviderI
         return $resourceClass === Catalogue::class;
     }
 
-    /* public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = []): ?Catalogue {
+    public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = []): ?Catalogue {
         $catalogue = new Catalogue();
         $burgers = $this->burgerRepo->findBy(['isAvailable' => true]);
         $menus = $this->menuRepo->findBy(['isAvailable' => true]);
         $catalogue->setBurgers($burgers);
         $catalogue->setMenus($menus);
         return $catalogue;
-    } */
+    }
 
-    public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []) {
+    /* public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []) {
         $burgers = $this->burgerRepo->findBy(['isAvailable' => true]);
         $menus = $this->menuRepo->findBy(['isAvailable' => true]);
         return [["burgers" => $burgers, "menus" => $menus]];
-    }
+    } */
 }

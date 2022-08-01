@@ -6,6 +6,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
+    collectionOperations: [],
     itemOperations: [
         'get'
     ]
@@ -17,6 +18,11 @@ class Catalogue {
 
     private $burgers = [];
     private $menus = [];
+
+
+    public function __construct() {
+        $this->id = 1;
+    }
 
     public function getId(): ?int {
         return $this->id;

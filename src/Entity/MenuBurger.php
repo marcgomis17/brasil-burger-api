@@ -14,22 +14,34 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     /* input: MenuBurgerInput::class,
     output: MenuBurgerOutput::class, */
-    collectionOperations: [
-        'get',
+    /* collectionOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+        ],
         'post' => [
+            "denormalization_context" => ["groups" => ['menuBurger:write']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ],
     itemOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+        ],
         'put' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+            "denormalization_context" => ["groups" => ['menuBurger:write']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ],
         'patch' => [
+            "denormalization_context" => ["groups" => ['menuBurger:write']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
-    ]
-)]
+    ] */)]
 class MenuBurger {
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -62,6 +62,9 @@ class Produit {
     #[Groups(['product:write'])]
     private $sPrix;
 
+    #[ORM\Column(type: 'string', length: 30)]
+    private $type;
+
     #[ORM\Column(type: 'boolean', nullable: false)]
     protected $isAvailable;
 
@@ -152,6 +155,16 @@ class Produit {
 
     public function setGestionnaire(?Gestionnaire $gestionnaire): self {
         $this->gestionnaire = $gestionnaire;
+
+        return $this;
+    }
+
+    public function getType(): ?string {
+        return $this->type;
+    }
+
+    public function setType(string $type): self {
+        $this->type = $type;
 
         return $this;
     }

@@ -17,6 +17,9 @@ use App\Repository\TailleBoissonRepository;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use App\Entity\Boisson;
+use App\Entity\Burger;
+use App\Entity\PortionFrite;
 
 final class ProduitPersister implements DataPersisterInterface {
     private $decoder;
@@ -58,14 +61,21 @@ final class ProduitPersister implements DataPersisterInterface {
         $data->setImage($this->uploader->upload($body['image']));
         $data->setIsAvailable(true);
         $data->setGestionnaire($this->security->getUser());
-        if (!($data instanceof Menu)) {
-            $data->setPrix((int)$body['prix']);
-        }
-        if (isset($body['taille'])) {
+        if ($data instanceof Burger) $data->setType('burger');
+        if ($data instanceof PortionFrite) $data->setType('frite');
+        if ($data instanceof Menu) $data->setType('menu');
+        if ($data instanceof Boisson) $data->setType('boisson');
+
+        /* if (isset($body['taille'])) {
             foreach ($body['taille'] as $taille) {
                 $data->addTaille($this->tailleRepo->findOneBy(['id' => $taille['id']]));
             }
+        } */
+
+        if (!($data instanceof Menu)) {
+            $data->setPrix((int)$body['prix']);
         }
+
         if ($data instanceof Menu) {
             $menuBurger = new MenuBurger();
             $menuTaille = new MenuTailleBoisson();
@@ -76,19 +86,17 @@ final class ProduitPersister implements DataPersisterInterface {
             }
             foreach ($body['menuTailles'] as $taille) {
                 $menuTaille->setQuantite($taille['quantite']);
-                $menuTaille->setTailles($this->tailleRepo->findOneBy(['id' => $taille['taille']['id']]));
+                $menuTaille->setTailles($this->tailleRepo->findOneBy(['id' => $taille['tailles']['id']]));
             }
             foreach ($body['menuFrites'] as $frite) {
                 $menuFrite->setQuantite($frite['quantite']);
-                $menuFrite->setFrites($this->friteRepo->findOneBy(['id' => $frite['portionFrite']['id']]));
+                $menuFrite->setFrites($this->friteRepo->findOneBy(['id' => $frite['frites']['id']]));
             }
-            $data->setMenuBurgers($menuBurger);
+            $data->addMenuBurger($menuBurger);
             $data->addMenuFrite($menuFrite);
             $data->addMenuTaille($menuTaille);
-            $data->setGestionnaire($this->security->getUser());
             $data->setPrix($this->calcul->calculPrix($data));
         }
-        dd($data);
         $this->em->persist($data);
         $this->em->flush();
     }

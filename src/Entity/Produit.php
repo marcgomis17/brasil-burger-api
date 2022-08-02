@@ -47,7 +47,7 @@ class Produit {
             new Assert\Positive()
         ]
     )]
-    #[Groups(['product:read'])]
+    #[Groups(['product:read', 'menu:read'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
@@ -112,7 +112,7 @@ class Produit {
     }
 
     public function getImage() {
-        return base64_encode(stream_get_contents($this->image));
+        return stream_get_contents($this->image);
     }
 
     public function setImage($image): self {

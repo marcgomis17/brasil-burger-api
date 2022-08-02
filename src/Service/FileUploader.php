@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\IService\IFileUploader;
+use Symfony\Component\HttpFoundation\File\File;
 
 class FileUploader implements IFileUploader {
     private $denormalizer;
@@ -12,7 +13,7 @@ class FileUploader implements IFileUploader {
     }
 
     public function upload($image) {
-        $this->denormalizer->denormalize($image, String::class);
+        $this->denormalizer->denormalize($image, File::class);
         $blob = base64_encode(file_get_contents($image));
         return $blob;
     }

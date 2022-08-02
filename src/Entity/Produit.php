@@ -112,7 +112,7 @@ class Produit {
     }
 
     public function getImage() {
-        return stream_get_contents($this->image);
+        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8');
     }
 
     public function setImage($image): self {

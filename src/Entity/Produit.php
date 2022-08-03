@@ -32,12 +32,12 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'menu:write', 'menu:read'])]
+    #[Groups(['product:read', 'menu:write', 'menu:read', 'details:read'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:write', 'product:read'])]
+    #[Groups(['product:write','product:read', 'details:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -47,11 +47,11 @@ class Produit {
             new Assert\Positive()
         ]
     )]
-    #[Groups(['product:read', 'menu:read'])]
+    #[Groups(['product:read','menu:read', 'details:read'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    #[Groups(['product:read'])]
+    #[Groups(['product:read', 'details:read'])]
     protected $image;
 
     #[SerializedName('image')]
@@ -63,6 +63,7 @@ class Produit {
     private $sPrix;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['details:read'])]
     private $type;
 
     #[ORM\Column(type: 'boolean', nullable: false)]

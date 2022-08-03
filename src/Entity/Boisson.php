@@ -9,6 +9,7 @@ use App\Repository\BoissonRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
 #[ApiResource(
@@ -38,12 +39,17 @@ use Doctrine\Common\Collections\ArrayCollection;
     ]
 )]
 class Boisson extends Produit {
+    #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'boissons')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['product:write', 'product:read'])]
+    private $taille;
+
     #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: BoissonTaille::class)]
     private $boissonTaille;
 
     public function __construct() {
-        parent::__construct();
         $this->boissonTaille = new ArrayCollection();
+        $this->setType('boisson');
     }
 
     /**
@@ -69,6 +75,16 @@ class Boisson extends Produit {
                 $BoissonTaille->setBoisson(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTaille(): ?TailleBoisson {
+        return $this->taille;
+    }
+
+    public function setTaille(?TailleBoisson $taille): self {
+        $this->taille = $taille;
 
         return $this;
     }

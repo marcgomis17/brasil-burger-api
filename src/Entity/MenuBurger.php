@@ -50,12 +50,12 @@ class MenuBurger {
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
-    #[Groups(['menu:write', 'menu:read'])]
+    #[Groups(['menu:write','menu:read', 'details:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['menu:write', 'menu:read'])]
+    #[Groups(['menu:write','menu:read', 'details:read'])]
     private $burger;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuBurgers')]

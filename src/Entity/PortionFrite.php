@@ -53,6 +53,7 @@ class PortionFrite extends Produit {
         $this->menus = new ArrayCollection();
         $this->menuPortionFrites = new ArrayCollection();
         $this->portionFriteCommandes = new ArrayCollection();
+        $this->setType('frite');
     }
 
     /**

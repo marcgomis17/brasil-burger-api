@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\DetailRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\DetailRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     collectionOperations: [],
     itemOperations: [
-        'get'
+        'get' => [
+            "normalization_context" => ["groups" => ['details:read']]
+        ]
     ]
 )]
 class Detail {
@@ -17,12 +20,14 @@ class Detail {
     #[ORM\GeneratedValue]
     private $id;
 
+    #[Groups('details:read')]
     private $produit;
-    private $boissons = [];
-    private $frites = [];
 
-    public function __construct() {
-    }
+    #[Groups('details:read')]
+    private $boissons = [];
+
+    #[Groups('details:read')]
+    private $frites = [];
 
     public function getId(): ?int {
         return $this->id;

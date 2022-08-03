@@ -48,7 +48,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     ]
 )]
 class Menu extends Produit {
-    #[Groups(['menu:read'])]
+    #[Groups(['menu:read', 'details:read'])]
     public $id;
 
     #[Groups(['menu:write', 'menu:read'])]
@@ -56,17 +56,17 @@ class Menu extends Produit {
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
     #[Assert\Count(min: 1)]
-    #[Groups(['menu:write', 'menu:read'])]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuPortionFrite::class, cascade: ["persist"])]
     #[Assert\Count(min: 1)]
-    #[Groups(['menu:write', 'menu:read'])]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $menuFrites;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTailleBoisson::class, cascade: ["persist"])]
     #[Assert\Count(min: 1)]
-    #[Groups(['menu:write', 'menu:read'])]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $menuTailles;
 
     #[SerializedName('image')]
@@ -87,6 +87,7 @@ class Menu extends Produit {
         $this->menuBurgers = new ArrayCollection();
         $this->menuFrites = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
+        $this->setType('menu');
     }
 
     /**

@@ -37,7 +37,7 @@ class Produit {
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:write','product:read', 'details:read'])]
+    #[Groups(['product:write', 'product:read', 'details:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -47,7 +47,7 @@ class Produit {
             new Assert\Positive()
         ]
     )]
-    #[Groups(['product:read','menu:read', 'details:read'])]
+    #[Groups(['product:read', 'menu:read', 'details:read'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
@@ -113,7 +113,7 @@ class Produit {
     }
 
     public function getImage() {
-        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8');
+        return is_resource($this->image) ? mb_convert_encoding(stream_get_contents(($this->image)), 'UTF-8') : mb_convert_encoding($this->image, 'UTF-8');
     }
 
     public function setImage($image): self {

@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Validator\MenuValidator;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -47,6 +48,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         ]
     ]
 )]
+#[Assert\Callback([MenuValidator::class, 'validate'])]
 class Menu extends Produit {
     #[Groups(['menu:read', 'details:read'])]
     public $id;
@@ -60,12 +62,10 @@ class Menu extends Produit {
     private $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuPortionFrite::class, cascade: ["persist"])]
-    #[Assert\Count(min: 1)]
     #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $menuFrites;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTailleBoisson::class, cascade: ["persist"])]
-    #[Assert\Count(min: 1)]
     #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $menuTailles;
 

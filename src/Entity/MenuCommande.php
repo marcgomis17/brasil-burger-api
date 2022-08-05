@@ -17,21 +17,17 @@ class MenuCommande {
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['orders:write', 'orders:read', 'orders:read:post'])]
     #[Assert\Positive()]
+    #[Groups(['order:write', 'order:read'])]
     private $quantite;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuCommandes')]
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuCommandes', cascade: ["persist"])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['orders:write', 'orders:read', 'orders:read:post'])]
+    #[Groups(['order:write', 'order:read'])]
     private $menu;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'menuCommandes')]
-    #[ORM\JoinColumn(nullable: false)]
     private $commande;
-
-    public function __construct() {
-    }
 
     public function getId(): ?int {
         return $this->id;
@@ -57,11 +53,13 @@ class MenuCommande {
         return $this;
     }
 
-    public function getCommande(): ?Commande {
+    public function getCommande(): ?Commande
+    {
         return $this->commande;
     }
 
-    public function setCommande(?Commande $commande): self {
+    public function setCommande(?Commande $commande): self
+    {
         $this->commande = $commande;
 
         return $this;

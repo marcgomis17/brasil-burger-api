@@ -18,16 +18,15 @@ class PortionFriteCommande {
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['orders:write', 'orders:read', 'orders:read:post'])]
     #[Assert\Positive()]
+    #[Groups(['order:write', 'order:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: PortionFrite::class, inversedBy: 'portionFriteCommandes')]
-    #[Groups(['orders:write', 'orders:read', 'orders:read:post'])]
+    #[Groups(['order:write', 'order:read'])]
     private $frite;
 
-    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'friteCommandes')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'portionFriteCommande')]
     private $commande;
 
     public function getId(): ?int {

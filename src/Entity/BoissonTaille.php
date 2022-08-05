@@ -3,20 +3,19 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\BoissonTailleRepository;
+use App\Repository\BoissonRepository;
 
-#[ORM\Entity(repositoryClass: BoissonTailleRepository::class)]
+#[ORM\Entity(repositoryClass: BoissonRepository::class)]
 class BoissonTaille {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'boissonTaille')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'boissonTailles')]
     private $boisson;
 
-    #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'boissonTaille')]
+    #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'boissonTailles')]
     #[ORM\JoinColumn(nullable: false)]
     private $taille;
 

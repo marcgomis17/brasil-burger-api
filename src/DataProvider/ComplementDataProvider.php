@@ -5,11 +5,8 @@ namespace App\DataProvider;
 use App\Entity\Complement;
 use App\Repository\BoissonRepository;
 use App\Repository\PortionFriteRepository;
-use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use PhpParser\Node\Expr\Cast\Array_;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
 final class ComplementDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface {
     private $boissonsRepo;

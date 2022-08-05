@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Core\Annotation\ApiResource;
 use App\DTO\MenuPortionFriteInput;
 use App\DTO\MenuPortionFriteOutput;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MenuPortionFriteRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;

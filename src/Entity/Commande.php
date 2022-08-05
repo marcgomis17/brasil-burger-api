@@ -2,25 +2,27 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStage;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 #[ApiResource(
     collectionOperations: [
         'get' => [
             'method' => 'GET',
-            'normalization_context' => ['groups' => ['orders:read']],
+            'normalization_context' => ['groups' => ['order:read']],
         ],
         'post' => [
             'method' => 'POST',
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['orders:write']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE') or is_granted('ROLE_CLIENT')",
+            'denormalization_context' => ['groups' => ['order:write']],
+            'normalization_context' => ['groups' => ['order:read']],
         ]
     ],
     itemOperations: [
@@ -34,30 +36,59 @@ class Commande {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['order:read'])]
     private $id;
-
-    #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['orders:write', 'orders:read'])]
-    private $zone;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['orders:write', 'orders:read'])]
+    #[Groups(['order:read'])]
     private $client;
 
-    #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'commandes')]
-    #[Groups(['orders:write', 'orders:read'])]
-    private $burgers;
+    #[ORM\ManyToOne(targetEntity: Quartier::class, inversedBy: 'commandes')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:write', 'order:read'])]
+    private $quartier;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'commandes')]
-    #[Groups(['orders:write', 'orders:read'])]
-    private $menus;
+    #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:read'])]
+    private $zone;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BurgerCommande::class, cascade: ["persist"])]
+    #[SerializedName('burgers')]
+    #[Groups(['order:write', 'order:read'])]
+    private $burgerCommandes;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: MenuCommande::class, cascade: ["persist"])]
+    #[SerializedName('menus')]
+    // #[Groups(['order:write', 'order:read'])]
+    private $menuCommandes;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: PortionFriteCommande::class, cascade: ["persist"])]
+    #[SerializedName('frites')]
+    #[Groups(['order:write', 'order:read'])]
+    private $portionFriteCommande;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BoissonTailleCommande::class, cascade: ["persist"])]
+    #[SerializedName('boissons')]
+    #[Groups(['order:write', 'order:read'])]
+    private $boissonTailleCommandes;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $prixCommande;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $prixTotal;
+
+    #[ORM\Column(type: 'datetime')]
+    private $dateCommande;
 
     public function __construct() {
-        $this->produits = new ArrayCollection();
-        $this->burgers = new ArrayCollection();
-        $this->menus = new ArrayCollection();
+        $this->burgerCommandes = new ArrayCollection();
+        $this->menuCommandes = new ArrayCollection();
+        $this->portionFriteCommande = new ArrayCollection();
+        $this->boissonTailleCommandes = new ArrayCollection();
+        $this->setDateCommande(new DateTime());
     }
 
     public function getId(): ?int {
@@ -84,44 +115,151 @@ class Commande {
         return $this;
     }
 
-    /**
-     * @return Collection<int, Burger>
-     */
-    public function getBurgers(): Collection {
-        return $this->burgers;
+
+    public function getQuartier(): ?Quartier {
+        return $this->quartier;
     }
 
-    public function addBurger(Burger $burger): self {
-        if (!$this->burgers->contains($burger)) {
-            $this->burgers[] = $burger;
-        }
-
-        return $this;
-    }
-
-    public function removeBurger(Burger $burger): self {
-        $this->burgers->removeElement($burger);
+    public function setQuartier(?Quartier $quartier): self {
+        $this->quartier = $quartier;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Menu>
+     * @return Collection<int, BurgerCommande>
      */
-    public function getMenus(): Collection {
-        return $this->menus;
+    public function getBurgerCommandes(): Collection {
+        return $this->burgerCommandes;
     }
 
-    public function addMenu(Menu $menu): self {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
+    public function addBurgerCommande(BurgerCommande $burgerCommande): self {
+        if (!$this->burgerCommandes->contains($burgerCommande)) {
+            $this->burgerCommandes[] = $burgerCommande;
+            $burgerCommande->setCommande($this);
         }
 
         return $this;
     }
 
-    public function removeMenu(Menu $menu): self {
-        $this->menus->removeElement($menu);
+    public function removeBurgerCommande(BurgerCommande $burgerCommande): self {
+        if ($this->burgerCommandes->removeElement($burgerCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($burgerCommande->getCommande() === $this) {
+                $burgerCommande->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MenuCommande>
+     */
+    public function getMenuCommandes(): Collection {
+        return $this->menuCommandes;
+    }
+
+    public function addMenuCommande(MenuCommande $menuCommande): self {
+        if (!$this->menuCommandes->contains($menuCommande)) {
+            $this->menuCommandes[] = $menuCommande;
+            $menuCommande->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenuCommande(MenuCommande $menuCommande): self {
+        if ($this->menuCommandes->removeElement($menuCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($menuCommande->getCommande() === $this) {
+                $menuCommande->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PortionFriteCommande>
+     */
+    public function getPortionFriteCommande(): Collection {
+        return $this->portionFriteCommande;
+    }
+
+    public function addPortionFriteCommande(PortionFriteCommande $portionFriteCommande): self {
+        if (!$this->portionFriteCommande->contains($portionFriteCommande)) {
+            $this->portionFriteCommande[] = $portionFriteCommande;
+            $portionFriteCommande->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removePortionFriteCommande(PortionFriteCommande $portionFriteCommande): self {
+        if ($this->portionFriteCommande->removeElement($portionFriteCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($portionFriteCommande->getCommande() === $this) {
+                $portionFriteCommande->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BoissonTailleCommande>
+     */
+    public function getBoissonTailleCommandes(): Collection {
+        return $this->boissonTailleCommandes;
+    }
+
+    public function addBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
+        if (!$this->boissonTailleCommandes->contains($boissonTailleCommande)) {
+            $this->boissonTailleCommandes[] = $boissonTailleCommande;
+            $boissonTailleCommande->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
+        if ($this->boissonTailleCommandes->removeElement($boissonTailleCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($boissonTailleCommande->getCommande() === $this) {
+                $boissonTailleCommande->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPrixCommande(): ?int {
+        return $this->prixCommande;
+    }
+
+    public function setPrixCommande(?int $prixCommande): self {
+        $this->prixCommande = $prixCommande;
+
+        return $this;
+    }
+
+    public function getPrixTotal(): ?int {
+        return $this->prixTotal;
+    }
+
+    public function setPrixTotal(?int $prixTotal): self {
+        $this->prixTotal = $prixTotal;
+
+        return $this;
+    }
+
+    public function getDateCommande(): ?\DateTimeInterface {
+        return $this->dateCommande;
+    }
+
+    public function setDateCommande(\DateTimeInterface $dateCommande): self {
+        $this->dateCommande = $dateCommande;
 
         return $this;
     }

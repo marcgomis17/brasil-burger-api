@@ -27,17 +27,17 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         "portion_frite" => "PortionFrite"
     ]
 )]
-#[ApiResource(input: ProduitInput::class, output: ProduitOutput::class)]
+#[ApiResource(/* input: ProduitInput::class, output: ProduitOutput::class */)]
 class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'menu:write', 'menu:read', 'details:read'])]
+    #[Groups(['product:read', 'menu:write', 'menu:read', 'details:read', 'order:write', 'order:read'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:write', 'product:read', 'details:read'])]
+    #[Groups(['product:write', 'product:read', 'details:read', 'order:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -47,11 +47,11 @@ class Produit {
             new Assert\Positive()
         ]
     )]
-    #[Groups(['product:read', 'menu:read', 'details:read'])]
+    #[Groups(['product:read', 'menu:read', 'details:read', 'order:read'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    #[Groups(['product:read', 'details:read'])]
+    #[Groups(['product:read', 'details:read', 'order:read'])]
     protected $image;
 
     #[SerializedName('image')]

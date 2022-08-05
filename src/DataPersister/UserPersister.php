@@ -4,12 +4,12 @@ namespace App\DataPersister;
 
 use App\Entity\User;
 use App\Entity\Client;
+use App\Entity\Livreur;
 use App\Service\Hasher;
 use App\Service\Mailer;
 use App\Entity\Gestionnaire;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use App\Entity\Livreur;
 
 class UserPersister implements DataPersisterInterface {
     private $manager;

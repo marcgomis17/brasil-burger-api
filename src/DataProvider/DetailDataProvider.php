@@ -3,7 +3,6 @@
 namespace App\DataProvider;
 
 use App\Entity\Detail;
-use App\Entity\Produit;
 use App\Repository\ProduitRepository;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;

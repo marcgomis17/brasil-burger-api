@@ -34,16 +34,17 @@ class MenuTailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['menu:read', 'details:read'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
-    #[Groups(['menu:write','menu:read', 'details:read'])]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'menuTailleBoissons')]
     #[Assert\Valid()]
-    #[Groups(['menu:write','menu:read', 'details:read'])]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $tailles;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]

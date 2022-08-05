@@ -4,11 +4,11 @@ namespace App\Entity;
 
 use App\DTO\MenuInput;
 use App\DTO\MenuOutput;
+use App\Validator\MenuValidator;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Validator\MenuValidator;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -76,14 +76,10 @@ class Menu extends Produit {
     #[Groups(['menu:read'])]
     protected $image;
 
-    #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'menus')]
-    private $commandes;
-
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuCommande::class)]
     private $menuCommandes;
 
     public function __construct() {
-        $this->commandes = new ArrayCollection();
         $this->menuBurgers = new ArrayCollection();
         $this->menuFrites = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();

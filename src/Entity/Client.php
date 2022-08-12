@@ -16,31 +16,44 @@ use Symfony\Component\Serializer\Annotation\Groups;
     /* input: ClientInput::class,
     output: ClientOutput::class, */
     collectionOperations: [
-        'get',
-        'post'
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'post' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
     ],
     itemOperations: [
-        'get',
-        'put',
-        'patch'
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'put' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'patch' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
     ]
 )]
 class Client extends User {
-    #[Groups(['order:read'])]
+    #[Groups(['user:read', 'order:read'])]
     public $id;
 
-    #[Groups(['order:read'])]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
     public $prenom;
 
-    #[Groups(['order:read'])]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
     public $nom;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['order:read'])]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
     private $adresse;
 
     #[ORM\Column(type: 'string', length: 30, nullable: true)]
-    #[Groups(['order:read'])]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]

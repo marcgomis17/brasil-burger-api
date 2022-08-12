@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         "livreur" => "Livreur",
     ]
 )]
-#[ApiResource(input: UserInput::class, output: UserOutput::class)]
+#[ApiResource(/* input: UserInput::class, output: UserOutput::class */)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -40,11 +40,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     private $nom;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['user:read', 'user:write'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
     private $roles = [];
 
+    #[Groups(['user:write'])]
     #[SerializedName('password')]
     private $plainPassword;
 

@@ -61,7 +61,7 @@ class Commande {
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: MenuCommande::class, cascade: ["persist"])]
     #[SerializedName('menus')]
-    // #[Groups(['order:write', 'order:read'])]
+    #[Groups(['order:write', 'order:read'])]
     private $menuCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: PortionFriteCommande::class, cascade: ["persist"])]
@@ -75,13 +75,20 @@ class Commande {
     private $boissonTailleCommandes;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['order:read'])]
     private $prixCommande;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['order:read'])]
     private $prixTotal;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['order:read'])]
     private $dateCommande;
+
+    #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['order:read'])]
+    private $numeroCommande;
 
     public function __construct() {
         $this->burgerCommandes = new ArrayCollection();
@@ -260,6 +267,16 @@ class Commande {
 
     public function setDateCommande(\DateTimeInterface $dateCommande): self {
         $this->dateCommande = $dateCommande;
+
+        return $this;
+    }
+
+    public function getNumeroCommande(): ?string {
+        return $this->numeroCommande;
+    }
+
+    public function setNumeroCommande(string $numeroCommande): self {
+        $this->numeroCommande = $numeroCommande;
 
         return $this;
     }

@@ -39,14 +39,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 class Client extends User {
-    #[Groups(['user:read', 'order:read'])]
+    /* #[Groups(['user:read', 'order:read'])]
     public $id;
 
     #[Groups(['user:read', 'user:write', 'order:read'])]
     public $prenom;
 
     #[Groups(['user:read', 'user:write', 'order:read'])]
-    public $nom;
+    public $nom; */
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     #[Groups(['user:read', 'user:write', 'order:read'])]

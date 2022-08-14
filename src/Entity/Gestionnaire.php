@@ -12,11 +12,29 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: GestionnaireRepository::class)]
 #[ApiResource(
-    input: GestionnaireInput::class,
-    output: GestionnaireOutput::class,
+    /* input: GestionnaireInput::class,
+    output: GestionnaireOutput::class, */
     collectionOperations: [
-        'get',
-        'post'
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'post' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'put' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'patch' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
     ]
 )]
 class Gestionnaire extends User {
@@ -25,8 +43,8 @@ class Gestionnaire extends User {
 
     public function __construct() {
         $this->setRoles(['ROLE_GESTIONNAIRE']);
-        $this->produits = new ArrayCollection();
         $this->setIsVerified(true);
+        $this->produits = new ArrayCollection();
     }
 
     /**

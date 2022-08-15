@@ -22,14 +22,13 @@ class BoissonTailleCommande {
     #[Assert\Positive()]
     private $quantite;
 
-    #[ORM\ManyToOne(targetEntity: BoissonTaille::class, inversedBy: 'boissonTailleCommandes')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['order:write', 'order:read'])]
-    #[SerializedName('boisson')]
-    private $boissonTaille;
-
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'boissonTailleCommandes')]
     private $commande;
+
+    #[ORM\ManyToOne(targetEntity: BoissonTaille::class, inversedBy: 'boissonTailleCommandes')]
+    #[Groups(['order:write', 'order:read'])]
+    #[SerializedName('boisson')]
+    private $boissonTailles;
 
     public function getId(): ?int {
         return $this->id;
@@ -55,12 +54,12 @@ class BoissonTailleCommande {
         return $this;
     }
 
-    public function getBoissonTaille(): ?BoissonTaille {
-        return $this->boissonTaille;
+    public function getBoissonTailles(): ?BoissonTaille {
+        return $this->boissonTailles;
     }
 
-    public function setBoissonTaille(?BoissonTaille $boissonTaille): self {
-        $this->boissonTaille = $boissonTaille;
+    public function setBoissonTailles(?BoissonTaille $boissonTailles): self {
+        $this->boissonTailles = $boissonTailles;
 
         return $this;
     }

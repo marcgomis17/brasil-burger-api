@@ -110,11 +110,13 @@ class TailleBoisson {
     /**
      * @return Collection<int, BoissonTaille>
      */
-    public function getBoissonTailles(): Collection {
+    public function getBoissonTailles(): Collection
+    {
         return $this->boissonTailles;
     }
 
-    public function addBoissonTaille(BoissonTaille $boissonTaille): self {
+    public function addBoissonTaille(BoissonTaille $boissonTaille): self
+    {
         if (!$this->boissonTailles->contains($boissonTaille)) {
             $this->boissonTailles[] = $boissonTaille;
             $boissonTaille->setTaille($this);
@@ -123,7 +125,8 @@ class TailleBoisson {
         return $this;
     }
 
-    public function removeBoissonTaille(BoissonTaille $boissonTaille): self {
+    public function removeBoissonTaille(BoissonTaille $boissonTaille): self
+    {
         if ($this->boissonTailles->removeElement($boissonTaille)) {
             // set the owning side to null (unless already changed)
             if ($boissonTaille->getTaille() === $this) {

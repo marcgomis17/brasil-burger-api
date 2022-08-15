@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\BoissonRepository;
+use App\Repository\BoissonTailleRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-#[ORM\Entity(repositoryClass: BoissonRepository::class)]
+#[ORM\Entity(repositoryClass: BoissonTailleRepository::class)]
 class BoissonTaille {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -15,17 +15,17 @@ class BoissonTaille {
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'boissonTailles')]
+    #[ORM\JoinColumn(nullable: false)]
     private $boisson;
 
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'boissonTailles')]
     #[ORM\JoinColumn(nullable: false)]
     private $taille;
 
-    #[ORM\OneToMany(mappedBy: 'boissonTaille', targetEntity: BoissonTailleCommande::class)]
+    #[ORM\OneToMany(mappedBy: 'boissonTailles', targetEntity: BoissonTailleCommande::class)]
     private $boissonTailleCommandes;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->boissonTailleCommandes = new ArrayCollection();
     }
 
@@ -56,27 +56,24 @@ class BoissonTaille {
     /**
      * @return Collection<int, BoissonTailleCommande>
      */
-    public function getBoissonTailleCommandes(): Collection
-    {
+    public function getBoissonTailleCommandes(): Collection {
         return $this->boissonTailleCommandes;
     }
 
-    public function addBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self
-    {
+    public function addBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
         if (!$this->boissonTailleCommandes->contains($boissonTailleCommande)) {
             $this->boissonTailleCommandes[] = $boissonTailleCommande;
-            $boissonTailleCommande->setBoissonTaille($this);
+            $boissonTailleCommande->setBoissonTailles($this);
         }
 
         return $this;
     }
 
-    public function removeBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self
-    {
+    public function removeBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
         if ($this->boissonTailleCommandes->removeElement($boissonTailleCommande)) {
             // set the owning side to null (unless already changed)
-            if ($boissonTailleCommande->getBoissonTaille() === $this) {
-                $boissonTailleCommande->setBoissonTaille(null);
+            if ($boissonTailleCommande->getBoissonTailles() === $this) {
+                $boissonTailleCommande->setBoissonTailles(null);
             }
         }
 

@@ -27,16 +27,13 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     ],
     itemOperations: [
         'get',
-        'put' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-        ]
     ]
 )]
 class Commande {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'user:read'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
@@ -46,48 +43,48 @@ class Commande {
 
     #[ORM\ManyToOne(targetEntity: Quartier::class, inversedBy: 'commandes')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['order:write', 'order:read'])]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
     private $quartier;
 
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'user:read'])]
     private $zone;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BurgerCommande::class, cascade: ["persist"])]
     #[SerializedName('burgers')]
-    #[Groups(['order:write', 'order:read'])]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
     private $burgerCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: MenuCommande::class, cascade: ["persist"])]
     #[SerializedName('menus')]
-    #[Groups(['order:write', 'order:read'])]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
     private $menuCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: PortionFriteCommande::class, cascade: ["persist"])]
     #[SerializedName('frites')]
-    #[Groups(['order:write', 'order:read'])]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
     private $portionFriteCommande;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BoissonTailleCommande::class, cascade: ["persist"])]
     #[SerializedName('boissons')]
-    #[Groups(['order:write', 'order:read'])]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
     private $boissonTailleCommandes;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'user:read'])]
     private $prixCommande;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'user:read'])]
     private $prixTotal;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'user:read'])]
     private $dateCommande;
 
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'user:read'])]
     private $numeroCommande;
 
     public function __construct() {

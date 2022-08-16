@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -36,18 +37,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "denormalization_context" => ["groups" => ['user:write']],
             "normalization_context" => ["groups" => ['user:read']]
         ]
+    ],
+    subresourceOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
     ]
 )]
 class Client extends User {
-    /* #[Groups(['user:read', 'order:read'])]
-    public $id;
-
-    #[Groups(['user:read', 'user:write', 'order:read'])]
-    public $prenom;
-
-    #[Groups(['user:read', 'user:write', 'order:read'])]
-    public $nom; */
-
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     #[Groups(['user:read', 'user:write', 'order:read'])]
     private $adresse;
@@ -57,6 +54,7 @@ class Client extends User {
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    #[ApiSubresource()]
     private $commandes;
 
     public function __construct() {

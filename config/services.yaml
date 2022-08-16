@@ -8,7 +8,6 @@ parameters:
 services:
   event.user_subcriber:
     class: App\EventSubscriber\UserSubscriber
-    arguments: ["@request_stack"]
     tags:
       - {
           name: kernel.event_listener,

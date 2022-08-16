@@ -87,6 +87,9 @@ class Commande {
     #[Groups(['order:read', 'user:read'])]
     private $numeroCommande;
 
+    #[ORM\Column(type: 'string', length: 30)]
+    private $etat;
+
     public function __construct() {
         $this->burgerCommandes = new ArrayCollection();
         $this->menuCommandes = new ArrayCollection();
@@ -274,6 +277,18 @@ class Commande {
 
     public function setNumeroCommande(string $numeroCommande): self {
         $this->numeroCommande = $numeroCommande;
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(string $etat): self
+    {
+        $this->etat = $etat;
 
         return $this;
     }

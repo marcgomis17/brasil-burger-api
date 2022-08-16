@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use DateTime;
 use App\DTO\UserInput;
 use App\DTO\UserOutput;
@@ -32,6 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[ApiProperty(identifier: true)]
     #[Groups(['user:read', 'order:read'])]
     private $id;
 

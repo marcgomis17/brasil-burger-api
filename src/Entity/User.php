@@ -34,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[ApiProperty(identifier: true)]
-    #[Groups(['user:read', 'order:read'])]
+    #[Groups(['user:read', 'order:read', 'deliver:read', 'deliver:write'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]

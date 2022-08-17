@@ -9,26 +9,42 @@ use App\Repository\LivreurRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
 #[ApiResource(
-    input: LivreurInput::class,
-    output: LivreurOutput::class,
+    /* input: LivreurInput::class,
+    output: LivreurOutput::class, */
     collectionOperations: [
-        'get',
-        'post'
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'post' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
     ],
     itemOperations: [
-        'get',
-        'put',
-        'patch'
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'put' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'patch' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
     ]
 )]
 class Livreur extends User {
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['user:write', 'user:read'])]
     private $matriculeMoto;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['user:read'])]
     private $etat;
 
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
@@ -36,6 +52,8 @@ class Livreur extends User {
 
     public function __construct() {
         $this->livraisons = new ArrayCollection();
+        $this->setEtat(true);
+        $this->setIsVerified(true);
     }
 
     public function getMatriculeMoto(): ?string {

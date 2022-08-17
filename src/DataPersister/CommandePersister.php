@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use App\IService\ICalculPrix;
 use App\IService\IGenerator;
+use App\Repository\BoissonTailleRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CommandePersister implements DataPersisterInterface {
@@ -14,12 +15,14 @@ class CommandePersister implements DataPersisterInterface {
     private EntityManagerInterface $em;
     private ICalculPrix $calculator;
     private IGenerator $generator;
+    private BoissonTailleRepository $repo;
 
-    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager, ICalculPrix $calculPrixService, IGenerator $generatorService) {
+    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager, ICalculPrix $calculPrixService, IGenerator $generatorService, BoissonTailleRepository $boissonTailleRepository) {
         $this->token = $tokenStorage;
         $this->em = $entityManager;
         $this->calculator = $calculPrixService;
         $this->generator = $generatorService;
+        $this->repo = $boissonTailleRepository;
     }
 
     public function supports($data): bool {
@@ -33,6 +36,7 @@ class CommandePersister implements DataPersisterInterface {
         $data->setPrixCommande($prixCommande);
         $data->setPrixTotal($prixCommande += $data->getZone()->getPrix());
         $data->setNumeroCommande($this->generator->generateOrderNumber());
+        $data->setEtat('En cours');
         $this->em->persist($data);
         $this->em->flush();
     }

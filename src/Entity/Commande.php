@@ -33,7 +33,7 @@ class Commande {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['order:read', 'user:read'])]
+    #[Groups(['order:read', 'user:read', 'deliver:read', 'deliver:write'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
@@ -88,7 +88,11 @@ class Commande {
     private $numeroCommande;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['order:read', 'user:read'])]
     private $etat;
+
+    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
+    private $livraison;
 
     public function __construct() {
         $this->burgerCommandes = new ArrayCollection();
@@ -281,14 +285,22 @@ class Commande {
         return $this;
     }
 
-    public function getEtat(): ?string
-    {
+    public function getEtat(): ?string {
         return $this->etat;
     }
 
-    public function setEtat(string $etat): self
-    {
+    public function setEtat(string $etat): self {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getLivraison(): ?Livraison {
+        return $this->livraison;
+    }
+
+    public function setLivraison(?Livraison $livraison): self {
+        $this->livraison = $livraison;
 
         return $this;
     }

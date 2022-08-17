@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\BurgerCommande;
 use App\IService\ICalculPrix;
 
 class CalculPrix implements ICalculPrix {
@@ -36,7 +35,7 @@ class CalculPrix implements ICalculPrix {
             $prixCommande += $portionFriteCommande->getQuantite() * $portionFriteCommande->getFrite()->getPrix();
         }
         foreach ($boissonTailleCommandes as $boissonTailleCommande) {
-            $prixCommande += $boissonTailleCommande->getQuantite() * $boissonTailleCommande->getBoissonTaille()->getTaille()->getPrix();
+            $prixCommande += $boissonTailleCommande->getQuantite() * $boissonTailleCommande->getBoissonTailles()->getTaille()->getPrix();
         }
         return $prixCommande;
     }

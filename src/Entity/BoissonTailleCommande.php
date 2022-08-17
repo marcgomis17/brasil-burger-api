@@ -22,13 +22,13 @@ class BoissonTailleCommande {
     #[Assert\Positive()]
     private $quantite;
 
-    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'boissonTailleCommandes')]
-    private $commande;
-
     #[ORM\ManyToOne(targetEntity: BoissonTaille::class, inversedBy: 'boissonTailleCommandes')]
     #[Groups(['order:write', 'order:read'])]
     #[SerializedName('boisson')]
     private $boissonTailles;
+
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'boissonTailleCommandes')]
+    private $commande;
 
     public function getId(): ?int {
         return $this->id;

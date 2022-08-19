@@ -42,11 +42,11 @@ class Zone {
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['zone:write', 'zone:read', 'quartier:read', 'order:read', 'order:write', 'deliver:read'])]
+    #[Groups(['zone:write', 'zone:read', 'quartier:read', 'order:read', 'deliver:read'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['zone:write', 'zone:read', 'quartier:read', 'order:read', 'order:write'])]
+    #[Groups(['zone:write', 'zone:read', 'quartier:read', 'order:read'])]
     private $prix;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]

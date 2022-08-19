@@ -15,14 +15,12 @@ class CommandePersister implements DataPersisterInterface {
     private EntityManagerInterface $em;
     private ICalculPrix $calculator;
     private IGenerator $generator;
-    private BoissonTailleRepository $repo;
 
-    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager, ICalculPrix $calculPrixService, IGenerator $generatorService, BoissonTailleRepository $boissonTailleRepository) {
+    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager, ICalculPrix $calculPrixService, IGenerator $generatorService) {
         $this->token = $tokenStorage;
         $this->em = $entityManager;
         $this->calculator = $calculPrixService;
         $this->generator = $generatorService;
-        $this->repo = $boissonTailleRepository;
     }
 
     public function supports($data): bool {
@@ -42,5 +40,8 @@ class CommandePersister implements DataPersisterInterface {
     }
 
     public function remove($data) {
+        $this->data->setEtat('Annulée');
+        $this->em->persist($data);
+        $this->em->flush();
     }
 }

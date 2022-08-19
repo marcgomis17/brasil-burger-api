@@ -5,10 +5,12 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
@@ -29,6 +31,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         'get',
     ]
 )]
+#[ApiFilter(DateFilter::class, properties: ['commande.dateCommande'])]
 class Commande {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -51,26 +54,6 @@ class Commande {
     #[Groups(['order:read', 'user:read'])]
     private $zone;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BurgerCommande::class, cascade: ["persist"])]
-    #[SerializedName('burgers')]
-    #[Groups(['order:write', 'order:read', 'user:read'])]
-    private $burgerCommandes;
-
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: MenuCommande::class, cascade: ["persist"])]
-    #[SerializedName('menus')]
-    #[Groups(['order:write', 'order:read', 'user:read'])]
-    private $menuCommandes;
-
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: PortionFriteCommande::class, cascade: ["persist"])]
-    #[SerializedName('frites')]
-    #[Groups(['order:write', 'order:read', 'user:read'])]
-    private $portionFriteCommande;
-
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BoissonTailleCommande::class, cascade: ["persist"])]
-    #[SerializedName('boissons')]
-    #[Groups(['order:write', 'order:read', 'user:read'])]
-    private $boissonTailleCommandes;
-
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['order:read', 'user:read'])]
     private $prixCommande;
@@ -90,6 +73,26 @@ class Commande {
     #[ORM\Column(type: 'string', length: 30)]
     #[Groups(['order:read', 'user:read'])]
     private $etat;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BurgerCommande::class, cascade: ["persist"])]
+    #[SerializedName('burgers')]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
+    private $burgerCommandes;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: MenuCommande::class, cascade: ["persist"])]
+    #[SerializedName('menus')]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
+    private $menuCommandes;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: PortionFriteCommande::class, cascade: ["persist"])]
+    #[SerializedName('frites')]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
+    private $portionFriteCommande;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BoissonTailleCommande::class, cascade: ["persist"])]
+    #[SerializedName('boissons')]
+    #[Groups(['order:write', 'order:read', 'user:read'])]
+    private $boissonTailleCommandes;
 
     #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
     private $livraison;
@@ -218,32 +221,6 @@ class Commande {
         return $this;
     }
 
-    /**
-     * @return Collection<int, BoissonTailleCommande>
-     */
-    public function getBoissonTailleCommandes(): Collection {
-        return $this->boissonTailleCommandes;
-    }
-
-    public function addBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
-        if (!$this->boissonTailleCommandes->contains($boissonTailleCommande)) {
-            $this->boissonTailleCommandes[] = $boissonTailleCommande;
-            $boissonTailleCommande->setCommande($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
-        if ($this->boissonTailleCommandes->removeElement($boissonTailleCommande)) {
-            // set the owning side to null (unless already changed)
-            if ($boissonTailleCommande->getCommande() === $this) {
-                $boissonTailleCommande->setCommande(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getPrixCommande(): ?int {
         return $this->prixCommande;
@@ -301,6 +278,33 @@ class Commande {
 
     public function setLivraison(?Livraison $livraison): self {
         $this->livraison = $livraison;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BoissonTailleCommande>
+     */
+    public function getBoissonTailleCommandes(): Collection {
+        return $this->boissonTailleCommandes;
+    }
+
+    public function addBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
+        if (!$this->boissonTailleCommandes->contains($boissonTailleCommande)) {
+            $this->boissonTailleCommandes[] = $boissonTailleCommande;
+            $boissonTailleCommande->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoissonTailleCommande(BoissonTailleCommande $boissonTailleCommande): self {
+        if ($this->boissonTailleCommandes->removeElement($boissonTailleCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($boissonTailleCommande->getCommande() === $this) {
+                $boissonTailleCommande->setCommande(null);
+            }
+        }
 
         return $this;
     }

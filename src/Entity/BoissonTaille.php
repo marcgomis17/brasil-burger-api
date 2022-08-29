@@ -15,15 +15,17 @@ class BoissonTaille {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'order:write', 'order:read', 'user:read'])]
+    #[Groups(['product:read', 'order:read', 'user:read'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'boissonTailles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:write'])]
     private $boisson;
 
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'boissonTailles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:write'])]
     private $taille;
 
     #[ORM\OneToMany(mappedBy: 'boissonTailles', targetEntity: BoissonTailleCommande::class)]

@@ -23,6 +23,9 @@ class Detail {
     private $produit;
 
     #[Groups('details:read')]
+    private $tailleBoissons = [];
+
+    // #[Groups('details:read')]
     private $boissons = [];
 
     #[Groups('details:read')]
@@ -93,6 +96,24 @@ class Detail {
      */
     public function setProduit($produit) {
         $this->produit = $produit;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of tailleBoissons
+     */
+    public function getTailleBoissons() {
+        return $this->tailleBoissons;
+    }
+
+    /**
+     * Set the value of tailleBoissons
+     *
+     * @return  self
+     */
+    public function setTailleBoissons($tailleBoissons) {
+        $this->tailleBoissons = $tailleBoissons;
 
         return $this;
     }

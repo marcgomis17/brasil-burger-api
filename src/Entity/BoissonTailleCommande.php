@@ -22,7 +22,7 @@ class BoissonTailleCommande {
     #[Assert\Positive()]
     private $quantite;
 
-    #[ORM\ManyToOne(targetEntity: BoissonTaille::class, inversedBy: 'boissonTailleCommandes')]
+    #[ORM\ManyToOne(targetEntity: BoissonTaille::class, inversedBy: 'boissonTailleCommandes', cascade: ["persist"])]
     #[Groups(['order:write', 'order:read'])]
     #[SerializedName('boisson')]
     private $boissonTailles;

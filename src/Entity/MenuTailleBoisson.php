@@ -47,9 +47,13 @@ class MenuTailleBoisson {
     #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $tailles;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailleBoissons')]
     #[ORM\JoinColumn(nullable: false)]
     private $menu;
+
+    /* #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $menu; */
 
     public function __construct() {
     }
@@ -78,11 +82,13 @@ class MenuTailleBoisson {
         return $this;
     }
 
-    public function getMenu(): ?Menu {
+    public function getMenu(): ?Menu
+    {
         return $this->menu;
     }
 
-    public function setMenu(?Menu $menu): self {
+    public function setMenu(?Menu $menu): self
+    {
         $this->menu = $menu;
 
         return $this;

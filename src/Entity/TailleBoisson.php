@@ -4,12 +4,13 @@ namespace App\Entity;
 
 use App\DTO\TailleBoissonInput;
 use App\DTO\TailleBoissonOutput;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TailleBoissonRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: TailleBoissonRepository::class)]
 #[ApiResource(
@@ -36,11 +37,11 @@ class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'taille:read', 'product:read', 'product:write', 'details:read'])]
+    #[Groups(['menu:write', 'menu:read', 'taille:read', 'product:read', 'product:write', 'order:write', 'details:read', 'menu:add:read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
-    #[Groups(['taille:write', 'taille:read', 'details:read'])]
+    #[Groups(['taille:write', 'taille:read', 'details:read', 'menu:add:read'])]
     private $libelle;
 
     #[ORM\Column(type: 'integer')]
@@ -110,13 +111,11 @@ class TailleBoisson {
     /**
      * @return Collection<int, BoissonTaille>
      */
-    public function getBoissonTailles(): Collection
-    {
+    public function getBoissonTailles(): Collection {
         return $this->boissonTailles;
     }
 
-    public function addBoissonTaille(BoissonTaille $boissonTaille): self
-    {
+    public function addBoissonTaille(BoissonTaille $boissonTaille): self {
         if (!$this->boissonTailles->contains($boissonTaille)) {
             $this->boissonTailles[] = $boissonTaille;
             $boissonTaille->setTaille($this);
@@ -125,8 +124,7 @@ class TailleBoisson {
         return $this;
     }
 
-    public function removeBoissonTaille(BoissonTaille $boissonTaille): self
-    {
+    public function removeBoissonTaille(BoissonTaille $boissonTaille): self {
         if ($this->boissonTailles->removeElement($boissonTaille)) {
             // set the owning side to null (unless already changed)
             if ($boissonTaille->getTaille() === $this) {

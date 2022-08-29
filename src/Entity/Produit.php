@@ -32,12 +32,12 @@ class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'menu:write', 'menu:read', 'details:read', 'order:write', 'order:read'])]
+    #[Groups(['product:read', 'menu:write', 'menu:read', 'details:read', 'order:write', 'order:read', 'menu:add:read'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:write', 'product:read', 'details:read', 'order:read'])]
+    #[Groups(['product:write', 'product:read', 'details:read', 'order:read', 'menu:add:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]

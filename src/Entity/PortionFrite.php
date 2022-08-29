@@ -40,7 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class PortionFrite extends Produit {
     #[ORM\Column(type: 'string', length: 70)]
-    #[Groups(['product:write', 'product:read',])]
+    #[Groups(['product:write', 'product:read', 'menu:add:read'])]
     private $portion;
 
     #[ORM\OneToMany(mappedBy: 'frites', targetEntity: MenuPortionFrite::class)]

@@ -45,7 +45,7 @@ class Livraison {
     private $zone;
 
     #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class)]
-    #[Groups(['deliver:read', 'deliver:write'])]
+    #[Groups(['deliver:read', 'deliver:write', 'user:read', 'user:write'])]
     private $commandes;
 
     public function __construct() {

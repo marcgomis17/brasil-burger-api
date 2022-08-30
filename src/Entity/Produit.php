@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\DTO\ProduitInput;
+use App\DTO\ProduitOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
@@ -20,21 +22,22 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[DiscriminatorMap(
     [
         "burger" => "Burger",
+        "menu" => "Menu",
         "boisson" => "Boisson",
         "portion_frite" => "PortionFrite"
     ]
 )]
-#[ApiResource()]
+#[ApiResource(/* input: ProduitInput::class, output: ProduitOutput::class */)]
 class Produit {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'menu:burger:write', 'orders:write', 'menu:frite:write', 'menu:taille:write'])]
+    #[Groups(['product:read', 'menu:write', 'menu:read', 'details:read', 'order:write', 'order:read', 'menu:add:read'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank()]
-    #[Groups(['product:read', 'product:read:post', 'product:write', 'menu:read:post', 'menu:burger:read:post'])]
+    #[Groups(['product:write', 'product:read', 'details:read', 'order:read', 'menu:add:read'])]
     protected $nom;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -44,28 +47,30 @@ class Produit {
             new Assert\Positive()
         ]
     )]
-    #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'menu:burger:read:post'])]
+    #[Groups(['product:read', 'menu:read', 'details:read', 'order:read'])]
     protected $prix;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    #[Groups(['product:read', 'product:read:post'])]
+    #[Groups(['product:read', 'details:read', 'order:read'])]
     protected $image;
 
-    #[ORM\Column(type: 'boolean', nullable: false)]
-    #[Groups(['product:read:post'])]
-    protected $isAvailable;
-
-    #[Groups(['product:write'])]
     #[SerializedName('image')]
+    #[Groups(['product:write'])]
     private ?File $file;
 
     #[SerializedName(('prix'))]
     #[Groups(['product:write'])]
     private $sPrix;
 
+    #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['details:read'])]
+    private $type;
+
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    protected $isAvailable;
+
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['product:read', 'product:write', 'product:read:post'])]
     private $gestionnaire;
 
     public function __construct() {
@@ -108,7 +113,7 @@ class Produit {
     }
 
     public function getImage() {
-        return mb_convert_encoding(stream_get_contents($this->image), 'UTF-8'); // FIXME: stream_get_contents parameter[#1] must be a resource, string given
+        return is_resource($this->image) ? mb_convert_encoding(stream_get_contents(($this->image)), 'UTF-8') : mb_convert_encoding($this->image, 'UTF-8');
     }
 
     public function setImage($image): self {
@@ -151,6 +156,16 @@ class Produit {
 
     public function setGestionnaire(?Gestionnaire $gestionnaire): self {
         $this->gestionnaire = $gestionnaire;
+
+        return $this;
+    }
+
+    public function getType(): ?string {
+        return $this->type;
+    }
+
+    public function setType(string $type): self {
+        $this->type = $type;
 
         return $this;
     }

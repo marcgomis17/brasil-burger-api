@@ -2,22 +2,38 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\GestionnaireRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\DTO\GestionnaireInput;
+use App\DTO\GestionnaireOutput;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\GestionnaireRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: GestionnaireRepository::class)]
 #[ApiResource(
+    /* input: GestionnaireInput::class,
+    output: GestionnaireOutput::class, */
     collectionOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['users:read']],
+            "normalization_context" => ["groups" => ['user:read']]
         ],
         'post' => [
-            'denormalization_context' => ['groups' => ['users:write']],
-            'normalization_context' => ['groups' => ['users:read:post']]
-
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'put' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'patch' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
         ]
     ]
 )]
@@ -25,14 +41,10 @@ class Gestionnaire extends User {
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
     private $produits;
 
-    #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Menu::class)]
-    private $menus;
-
     public function __construct() {
         $this->setRoles(['ROLE_GESTIONNAIRE']);
-        $this->produits = new ArrayCollection();
-        $this->menus = new ArrayCollection();
         $this->setIsVerified(true);
+        $this->produits = new ArrayCollection();
     }
 
     /**
@@ -56,33 +68,6 @@ class Gestionnaire extends User {
             // set the owning side to null (unless already changed)
             if ($produit->getGestionnaire() === $this) {
                 $produit->setGestionnaire(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenus(): Collection {
-        return $this->menus;
-    }
-
-    public function addMenu(Menu $menu): self {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->setGestionnaire($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMenu(Menu $menu): self {
-        if ($this->menus->removeElement($menu)) {
-            // set the owning side to null (unless already changed)
-            if ($menu->getGestionnaire() === $this) {
-                $menu->setGestionnaire(null);
             }
         }
 

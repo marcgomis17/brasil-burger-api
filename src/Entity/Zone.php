@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'denormalization_context' => ['groups' => ['zone:write']],
-            'normalization_context' => ['groups' => ['zone:read:post']],
+            'normalization_context' => ['groups' => ['zone:read']],
         ]
     ],
     itemOperations: [
@@ -38,15 +38,15 @@ class Zone {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['orders:write', 'quartier:write', 'quartier:read', 'zone:read'])]
+    #[Groups(['zone:read', 'quartier:write', 'order:read', 'order:write', 'deliver:read', 'deliver:write'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['zone:write', 'zone:read', 'zone:read:post', 'quartier:read'])]
+    #[Groups(['zone:write', 'zone:read', 'quartier:read', 'order:read', 'deliver:read'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['zone:write', 'zone:read', 'zone:read:post'])]
+    #[Groups(['zone:write', 'zone:read', 'quartier:read', 'order:read'])]
     private $prix;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]

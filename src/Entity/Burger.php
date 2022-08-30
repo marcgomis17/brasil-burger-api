@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\DTO\BurgerInput;
+use App\DTO\BurgerOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BurgerRepository;
 use Doctrine\Common\Collections\Collection;
@@ -10,38 +12,46 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: BurgerRepository::class)]
 #[ApiResource(
+    /* input: BurgerInput::class,
+    output: BurgerOutput::class, */
     collectionOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['product:read']],
+            "normalization_context" => ["groups" => ['product:read']],
         ],
         'post' => [
+            "denormalization_context" => ["groups" => ['product:write']],
+            "normalization_context" => ["groups" => ['product:read']],
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
-            'denormalization_context' => ['groups' => ['product:write']],
-            'normalization_context' => ['groups' => ['product:read:post']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ],
     itemOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['product:read']],
+        ],
         'put' => [
+            "denormalization_context" => ["groups" => ['product:write']],
+            "normalization_context" => ["groups" => ['product:read']],
             'input_formats' => [
                 'multipart' => ['multipart/form-data'],
             ],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ],
     ]
 )]
 class Burger extends Produit {
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'burgers')]
-    private $menus;
-
-    #[ORM\OneToMany(mappedBy: 'burgers', targetEntity: MenuBurger::class)]
+    #[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
     private $menuBurgers;
 
+    #[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class)]
+    private $burgerCommandes;
+
     public function __construct() {
-        parent::__construct();
-        $this->menus = new ArrayCollection();
         $this->menuBurgers = new ArrayCollection();
+        $this->burgerCommandes = new ArrayCollection();
+        $this->setType('burger');
     }
 
     /**
@@ -54,7 +64,7 @@ class Burger extends Produit {
     public function addMenuBurger(MenuBurger $menuBurger): self {
         if (!$this->menuBurgers->contains($menuBurger)) {
             $this->menuBurgers[] = $menuBurger;
-            $menuBurger->setBurgers($this);
+            $menuBurger->setBurger($this);
         }
 
         return $this;
@@ -63,8 +73,35 @@ class Burger extends Produit {
     public function removeMenuBurger(MenuBurger $menuBurger): self {
         if ($this->menuBurgers->removeElement($menuBurger)) {
             // set the owning side to null (unless already changed)
-            if ($menuBurger->getBurgers() === $this) {
-                $menuBurger->setBurgers(null);
+            if ($menuBurger->getBurger() === $this) {
+                $menuBurger->setBurger(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BurgerCommande>
+     */
+    public function getBurgerCommandes(): Collection {
+        return $this->burgerCommandes;
+    }
+
+    public function addBurgerCommande(BurgerCommande $burgerCommande): self {
+        if (!$this->burgerCommandes->contains($burgerCommande)) {
+            $this->burgerCommandes[] = $burgerCommande;
+            $burgerCommande->setBurger($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBurgerCommande(BurgerCommande $burgerCommande): self {
+        if ($this->burgerCommandes->removeElement($burgerCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($burgerCommande->getBurger() === $this) {
+                $burgerCommande->setBurger(null);
             }
         }
 

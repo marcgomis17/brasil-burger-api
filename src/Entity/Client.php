@@ -2,35 +2,59 @@
 
 namespace App\Entity;
 
+use App\DTO\ClientInput;
+use App\DTO\ClientOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ApiResource(
+    /* input: ClientInput::class,
+    output: ClientOutput::class, */
     collectionOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['users:read']]
+            "normalization_context" => ["groups" => ['user:read']]
         ],
         'post' => [
-            'denormalization_context' => ['groups' => ['users:write']],
-            'normalization_context' => ['groups' => ['users:read:post']]
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'put' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'patch' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
+    ],
+    subresourceOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
         ],
     ]
 )]
 class Client extends User {
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read', 'users:read:post'])]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
     private $adresse;
 
     #[ORM\Column(type: 'string', length: 30, nullable: true)]
-    #[Groups(['users:write', 'users:read', 'users:read:post'])]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    #[ApiSubresource()]
     private $commandes;
 
     public function __construct() {

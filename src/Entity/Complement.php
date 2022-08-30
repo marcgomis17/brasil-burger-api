@@ -2,108 +2,63 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use App\Repository\ComplementRepository;
+use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity()]
 #[ApiResource(
-    collectionOperations: [
-        'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['product:read']],
-        ],
+    itemOperations: [
+        'get'
     ]
 )]
 class Complement {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\OneToMany(mappedBy: 'complement', targetEntity: Boisson::class)]
-    #[Groups(['read', 'product:read'])]
-    private $boissons;
+    private $frites = [];
+    private $boissons = [];
 
-    #[ORM\OneToMany(mappedBy: 'complement', targetEntity: PortionFrite::class)]
-    #[Groups(['read', 'product:read'])]
-    private $frites;
-
-    public function __construct() {
-        $this->boissons = new ArrayCollection();
-        $this->frites = new ArrayCollection();
-    }
-
-    /**
-     * Get the value of id
-     */
-    public function getId() {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    /**
-     * Set the value of id
-     *
-     * @return  self
-     */
-    public function setId($id) {
-        $this->id = $id;
-
-        return $this;
+    public function __construct() {
+        $this->id = 1;
     }
 
     /**
-     * @return Collection<int, Boisson>
+     * Get the value of frites
      */
-    public function getBoissons(): Collection {
-        return $this->boissons;
-    }
-
-    public function addBoisson(Boisson $boisson): self {
-        if (!$this->boissons->contains($boisson)) {
-            $this->boissons[] = $boisson;
-            $boisson->setComplement($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBoisson(Boisson $boisson): self {
-        if ($this->boissons->removeElement($boisson)) {
-            // set the owning side to null (unless already changed)
-            if ($boisson->getComplement() === $this) {
-                $boisson->setComplement(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, PortionFrite>
-     */
-    public function getFrites(): Collection {
+    public function getFrites() {
         return $this->frites;
     }
 
-    public function addFrite(PortionFrite $frite): self {
-        if (!$this->frites->contains($frite)) {
-            $this->frites[] = $frite;
-            $frite->setComplement($this);
-        }
+    /**
+     * Set the value of frites
+     *
+     * @return  self
+     */
+    public function setFrites($frites) {
+        $this->frites = $frites;
 
         return $this;
     }
 
-    public function removeFrite(PortionFrite $frite): self {
-        if ($this->frites->removeElement($frite)) {
-            // set the owning side to null (unless already changed)
-            if ($frite->getComplement() === $this) {
-                $frite->setComplement(null);
-            }
-        }
+    /**
+     * Get the value of boissons
+     */
+    public function getBoissons() {
+        return $this->boissons;
+    }
+
+    /**
+     * Set the value of boissons
+     *
+     * @return  self
+     */
+    public function setBoissons($boissons) {
+        $this->boissons = $boissons;
 
         return $this;
     }

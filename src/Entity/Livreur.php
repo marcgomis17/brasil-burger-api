@@ -2,37 +2,65 @@
 
 namespace App\Entity;
 
+use App\DTO\LivreurInput;
+use App\DTO\LivreurOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreurRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
 #[ApiResource(
+    /* input: LivreurInput::class,
+    output: LivreurOutput::class, */
     collectionOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['users:read']],
+            "normalization_context" => ["groups" => ['user:read']]
         ],
         'post' => [
-            'denormalization_context' => ['groups' => ['users:write']]
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'put' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ],
+        'patch' => [
+            "denormalization_context" => ["groups" => ['user:write']],
+            "normalization_context" => ["groups" => ['user:read']]
+        ]
+    ],
+    subresourceOperations: [
+        'get' => [
+            "normalization_context" => ["groups" => ['user:read']]
         ]
     ]
 )]
 class Livreur extends User {
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['users:write', 'users:read'])]
+    #[Groups(['user:write', 'user:read'])]
     private $matriculeMoto;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['user:read'])]
     private $etat;
 
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
+    #[ApiSubresource()]
     private $livraisons;
 
     public function __construct() {
         $this->livraisons = new ArrayCollection();
+        $this->setEtat(true);
+        $this->setIsVerified(true);
     }
 
     public function getMatriculeMoto(): ?string {

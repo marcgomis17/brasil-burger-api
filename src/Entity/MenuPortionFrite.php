@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\DTO\MenuPortionFriteInput;
+use App\DTO\MenuPortionFriteOutput;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MenuPortionFriteRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -10,26 +12,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuPortionFriteRepository::class)]
 #[ApiResource(
+    /* input: MenuPortionFriteInput::class,
+    output: MenuPortionFriteOutput::class, */
     collectionOperations: [
-        'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['menu:frite:read']],
-        ],
+        'get',
         'post' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:frite:write']],
-            'normalization_context' => ['groups' => ['menu:frite:read:post']],
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:frite:write']],
         ],
         'patch' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:frite:write']],
         ]
     ]
 )]
@@ -37,17 +34,16 @@ class MenuPortionFrite {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:frites:read', 'menu:frites:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive()]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:frites:read', 'menu:frites:read:post', 'menu:frite:write'])]
+    #[Groups(['menu:write','menu:read', 'details:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: PortionFrite::class, inversedBy: 'menuPortionFrites')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:frites:read', 'menu:frites:read:post', 'menu:frite:write'])]
     #[Assert\Valid()]
+    #[Groups(['menu:write','menu:read', 'details:read'])]
     private $frites;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuFrites')]

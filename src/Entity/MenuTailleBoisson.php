@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\DTO\MenuTailleBoissonInput;
+use App\DTO\MenuTailleBoissonOutput;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MenuTailleBoissonRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -10,26 +12,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuTailleBoissonRepository::class)]
 #[ApiResource(
+    /* input: MenuTailleBoissonInput::class,
+    output: MenuTailleBoissonOutput::class, */
     collectionOperations: [
-        'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['menu:taille:read']],
-        ],
+        'get',
         'post' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:taille:write']],
-            'normalization_context' => ['groups' => ['menu:taille:read:post']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ]
     ],
     itemOperations: [
         'get',
         'put' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:taille:write']],
         ],
         'patch' => [
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:taille:write']],
         ]
     ]
 )]
@@ -37,22 +34,26 @@ class MenuTailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:taille:read', 'menu:taille:read:post'])]
+    #[Groups(['menu:read', 'details:read'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:taille:read', 'menu:taille:read:post', 'menu:taille:write'])]
     #[Assert\Positive()]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'menuTailleBoissons')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:taille:read', 'menu:taille:read:post', 'menu:taille:write'])]
     #[Assert\Valid()]
+    #[Groups(['menu:write', 'menu:read', 'details:read'])]
     private $tailles;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailleBoissons')]
     #[ORM\JoinColumn(nullable: false)]
     private $menu;
+
+    /* #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $menu; */
 
     public function __construct() {
     }
@@ -81,11 +82,13 @@ class MenuTailleBoisson {
         return $this;
     }
 
-    public function getMenu(): ?Menu {
+    public function getMenu(): ?Menu
+    {
         return $this->menu;
     }
 
-    public function setMenu(?Menu $menu): self {
+    public function setMenu(?Menu $menu): self
+    {
         $this->menu = $menu;
 
         return $this;

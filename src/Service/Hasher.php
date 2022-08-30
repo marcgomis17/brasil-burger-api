@@ -2,9 +2,10 @@
 
 namespace App\Service;
 
+use App\IService\IHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class Hasher {
+class Hasher implements IHasher {
     private $passwordHasher;
 
     public function __construct(UserPasswordHasherInterface $userPasswordHasherInterface) {

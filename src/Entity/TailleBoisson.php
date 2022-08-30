@@ -2,57 +2,62 @@
 
 namespace App\Entity;
 
+use App\DTO\TailleBoissonInput;
+use App\DTO\TailleBoissonOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TailleBoissonRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: TailleBoissonRepository::class)]
 #[ApiResource(
+    /* input: TailleBoissonInput::class,
+    output: TailleBoissonOutput::class, */
     collectionOperations: [
-        "get",
-        "post" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "denormalization_context" => ['groups' => ['boisson:write']],
+        'get' => [
+            "normalization_context" => ["groups" => ['taille:read']],
+        ],
+        'post' => [
+            "denormalization_context" => ["groups" => ['taille:write']],
+            "normalization_context" => ["groups" => ['taille:read']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
         ]
     ],
     itemOperations: [
         'get',
-        "put" => [
-            "security" => "is_granted('ROLE_GESTIONNAIRE')"
-        ]
+        'put' => [
+            'security' => "is_granted('ROLE_GESTIONNAIRE')",
+        ],
     ]
 )]
 class TailleBoisson {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:write', 'product:read', 'product:read:post', 'menu:write', 'menu:read:post', 'menu:taille:write'])]
+    #[Groups(['menu:write', 'menu:read', 'taille:read', 'product:read', 'product:write', 'order:write', 'details:read', 'menu:add:read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
-    #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'boisson:write'])]
+    #[Groups(['taille:write', 'taille:read', 'details:read', 'menu:add:read'])]
     private $libelle;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'product:read:post', 'menu:read:post', 'boisson:write'])]
+    #[Groups(['taille:write', 'taille:read', 'menu:read', 'details:read'])]
     private $prix;
 
     #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'tailles')]
+    #[Groups(['details:read'])]
     private $boissons;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'tailles')]
-    private $menus;
-
-    #[ORM\OneToMany(mappedBy: 'tailles', targetEntity: MenuTailleBoisson::class)]
-    private $menuTailleBoissons;
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: BoissonTaille::class)]
+    private $boissonTailles;
 
     public function __construct() {
         $this->boissons = new ArrayCollection();
-        $this->menus = new ArrayCollection();
-        $this->menuTailleBoissons = new ArrayCollection();
+        $this->boissonTailles = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -65,6 +70,16 @@ class TailleBoisson {
 
     public function setLibelle(string $libelle): self {
         $this->libelle = $libelle;
+
+        return $this;
+    }
+
+    public function getPrix(): ?int {
+        return $this->prix;
+    }
+
+    public function setPrix(int $prix): self {
+        $this->prix = $prix;
 
         return $this;
     }
@@ -93,37 +108,27 @@ class TailleBoisson {
         return $this;
     }
 
-    public function getPrix(): ?int {
-        return $this->prix;
-    }
-
-    public function setPrix(int $prix): self {
-        $this->prix = $prix;
-
-        return $this;
-    }
-
     /**
-     * @return Collection<int, MenuTailleBoisson>
+     * @return Collection<int, BoissonTaille>
      */
-    public function getMenuTailleBoissons(): Collection {
-        return $this->menuTailleBoissons;
+    public function getBoissonTailles(): Collection {
+        return $this->boissonTailles;
     }
 
-    public function addMenuTailleBoisson(MenuTailleBoisson $menuTailleBoisson): self {
-        if (!$this->menuTailleBoissons->contains($menuTailleBoisson)) {
-            $this->menuTailleBoissons[] = $menuTailleBoisson;
-            $menuTailleBoisson->setTailles($this);
+    public function addBoissonTaille(BoissonTaille $boissonTaille): self {
+        if (!$this->boissonTailles->contains($boissonTaille)) {
+            $this->boissonTailles[] = $boissonTaille;
+            $boissonTaille->setTaille($this);
         }
 
         return $this;
     }
 
-    public function removeMenuTailleBoisson(MenuTailleBoisson $menuTailleBoisson): self {
-        if ($this->menuTailleBoissons->removeElement($menuTailleBoisson)) {
+    public function removeBoissonTaille(BoissonTaille $boissonTaille): self {
+        if ($this->boissonTailles->removeElement($boissonTaille)) {
             // set the owning side to null (unless already changed)
-            if ($menuTailleBoisson->getTailles() === $this) {
-                $menuTailleBoisson->setTailles(null);
+            if ($boissonTaille->getTaille() === $this) {
+                $boissonTaille->setTaille(null);
             }
         }
 

@@ -2,14 +2,13 @@
 
 namespace App\DataProvider;
 
-use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Entity\Catalogue;
-use App\Repository\BurgerRepository;
 use App\Repository\MenuRepository;
-use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\BurgerRepository;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
-final class CatalogueDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
+final class CatalogueDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface {
     private $burgerRepo;
     private $menuRepo;
 
@@ -19,21 +18,15 @@ final class CatalogueDataProvider implements ContextAwareCollectionDataProviderI
     }
 
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool {
-        return $resourceClass == Catalogue::class;
+        return $resourceClass === Catalogue::class;
     }
 
-    public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []) {
+    public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = []): ?Catalogue {
         $catalogue = new Catalogue();
-        $burgers = $this->burgerRepo->findBy([/* 'isAvailable' => true */]);
-        $menus = $this->menuRepo->findBy([/* 'isAvailable' => true */]);
-        foreach ($burgers as $burger) {
-            $catalogue->addBurger($burger);
-        }
-        foreach ($menus as $menu) {
-            $catalogue->addMenu($menu);
-        }
-        $collection = new ArrayCollection(array('burgers' => $catalogue->getBurgers(), 'menus' => $catalogue->getMenus()));
-        dd($collection);
-        return $collection;
+        $burgers = $this->burgerRepo->findBy(['isAvailable' => true]);
+        $menus = $this->menuRepo->findBy(['isAvailable' => true]);
+        $catalogue->setBurgers($burgers);
+        $catalogue->setMenus($menus);
+        return $catalogue;
     }
 }

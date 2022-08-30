@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\DTO\MenuBurgerInput;
+use App\DTO\MenuBurgerOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuBurgerRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -10,59 +12,58 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuBurgerRepository::class)]
 #[ApiResource(
-    collectionOperations: [
+    /* input: MenuBurgerInput::class,
+    output: MenuBurgerOutput::class, */
+    /* collectionOperations: [
         'get' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['menu:burger:read']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
         ],
         'post' => [
+            "denormalization_context" => ["groups" => ['menuBurger:write']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:burger:write']],
-            'normalization_context' => ['groups' => ['menu:burger:read:post']],
         ]
     ],
     itemOperations: [
-        'get',
+        'get' => [
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+        ],
         'put' => [
-            'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:burger:write']],
+            "denormalization_context" => ["groups" => ['menuBurger:write']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
+            'security' => "is_granted('ROLE_GESTIONNAIRE')"
         ],
         'patch' => [
+            "denormalization_context" => ["groups" => ['menuBurger:write']],
+            "normalization_context" => ["groups" => ['menuBurger:read']],
             'security' => "is_granted('ROLE_GESTIONNAIRE')",
-            'denormalization_context' => ['groups' => ['menu:burger:write']],
         ]
-    ]
-)]
+    ] */)]
 class MenuBurger {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post'])]
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:burger:read', 'menu:burger:read:post', 'menu:burger:write'])]
     #[Assert\Positive()]
+    #[Groups(['menu:write','menu:read', 'details:read'])]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['menu:write', 'menu:read', 'menu:read:post', 'menu:burger:read', 'menu:burger:read:post', 'menu:burger:write'])]
-    #[Assert\Valid()]
-    private $burgers;
+    #[Groups(['menu:write','menu:read', 'details:read'])]
+    private $burger;
+
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuBurgers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $menu;
 
     public function getId(): ?int {
         return $this->id;
-    }
-
-    public function getBurgers(): ?Burger {
-        return $this->burgers;
-    }
-
-    public function setBurgers(?Burger $burgers): self {
-        $this->burgers = $burgers;
-
-        return $this;
     }
 
     public function getQuantite(): ?int {
@@ -71,6 +72,26 @@ class MenuBurger {
 
     public function setQuantite(int $quantite): self {
         $this->quantite = $quantite;
+
+        return $this;
+    }
+
+    public function getBurger(): ?Burger {
+        return $this->burger;
+    }
+
+    public function setBurger(?Burger $burger): self {
+        $this->burger = $burger;
+
+        return $this;
+    }
+
+    public function getMenu(): ?Menu {
+        return $this->menu;
+    }
+
+    public function setMenu(?Menu $menu): self {
+        $this->menu = $menu;
 
         return $this;
     }

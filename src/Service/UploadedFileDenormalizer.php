@@ -1,5 +1,4 @@
 <?php
-// api/src/Serializer/UploadedFileDenormalizer.php
 
 namespace App\Service;
 
@@ -10,14 +9,14 @@ final class UploadedFileDenormalizer implements DenormalizerInterface {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, string $type, string $format = null, array $context = []): UploadedFile {
-        return $data;
+    public function supportsDenormalization($data, $type, $format = null): bool {
+        return $data instanceof UploadedFile;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool {
-        return $data instanceof UploadedFile;
+    public function denormalize($data, string $type, string $format = null, array $context = []): UploadedFile {
+        return $data;
     }
 }

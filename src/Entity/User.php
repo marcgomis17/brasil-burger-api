@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use DateTime;
+use App\DTO\UserInput;
+use App\DTO\UserOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\InheritanceType;
@@ -10,6 +13,7 @@ use Doctrine\ORM\Mapping\DiscriminatorMap;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -24,36 +28,40 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         "livreur" => "Livreur",
     ]
 )]
-#[ApiResource()]
+#[ApiResource(/* input: UserInput::class, output: UserOutput::class */)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['users:read', 'orders:write', 'product:write', 'menu:write', 'product:read', 'product:read:post'])]
+    #[ApiProperty(identifier: true)]
+    #[Groups(['user:read', 'order:read', 'deliver:read', 'deliver:write'])]
     private $id;
 
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
+    #[Assert\NotBlank()]
+    private $prenom;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['user:read', 'user:write', 'order:read'])]
+    #[Assert\NotBlank()]
+    private $nom;
+
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(['users:write', 'users:read'])]
+    #[Groups(['user:read', 'user:write'])]
+    #[Assert\NotBlank(), Assert\Email()]
     private $email;
 
     #[ORM\Column(type: 'json')]
     private $roles = [];
 
+    #[Groups(['user:write'])]
     #[SerializedName('password')]
-    #[Groups(['users:write'])]
+    #[Assert\NotBlank()]
     private $plainPassword;
 
     #[ORM\Column(type: 'string')]
-    #[Groups(['users:read'])]
     private $password;
-
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read'])]
-    private $prenom;
-
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['users:write', 'users:read'])]
-    private $nom;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $isVerified;
